@@ -1,0 +1,146 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <Link rel=stylesheet type="text/css" href="css/style.css">
+   
+<!--- Beginning of Stylesheet -->
+    <style type="text/css">
+      
+ #rc-header{
+  text-align: center;
+  font-size: 40px;
+  font-family: Sans-serif;
+}
+
+#form-outlook{
+
+  padding-top: 15px;
+  font-family: Sans-serif;
+
+}
+
+.form-design{
+
+  width: 200px;
+  height: 25px;
+
+}
+
+.form-element{
+  padding: 20px;
+}
+
+
+.label-design{
+  padding: 10px;
+}
+
+#form-S{
+
+  border: 3px solid black;
+  width: 30%;
+  text-align: center;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  
+
+}
+    </style>
+
+<!-- END OF STYLE SHEET -->
+
+
+  </head>
+
+
+
+  <body>
+<!-- Main Container contents -->
+
+    <h1 id='rc-header' align="center">Roll Call</h1>
+    
+
+<!-- Start of form -->
+<div id='form-S' class="container">
+
+<form id="form-outlook" name="rosterForm" enctype="text/plain" method="POST" action="mailto:burnz@amazon.com?subject=Roster%20Request">
+
+ <div class="form-element">
+
+  <label for="userAlias" class="label-design">User:</label>
+      <input type="text" class="form-design" placeholder="User Alias" name="User" required="required">
+
+  </div>
+<div class="form-element">
+   <label for="sel1" class="label-design">Request Type:</label>
+      <select class="form-design" name="Request-Type" required="required">
+      <option value="" disabled selected>Select your option</option>
+      <option>Vacation</option>
+      <option>Sick</option>
+      <option>Training</option>
+      </select>
+</div>
+
+<div class="form-element">
+
+    <label for="sel1" class="label-design">My Shift:</label>
+      <select class="form-design" name="Weekly-Shift" required="required">
+      <option value="" disabled selected>Select your option</option>
+      <option>Sun - Thurs</option>
+      <option>Tues - Sat</option>
+      <option>Mon - Fri </option>
+      </select>
+
+</div>
+
+ <div class="form-element">
+
+  <label for="StartDate:" class="label-design">Start Date:</label>
+      <input id="startdate" type="date" data-date="" name="Start-Date" data-date-format="DD MM YYYY" value=""></input>
+  </div>
+
+  <div class="form-element">
+
+  <label for="No-Days:" class="label-design">Duration:</label>
+      <input type="number" class="form-design" placeholder="Duration" name="No-Days" required="required">
+
+  </div>
+
+  <div class="form-element">
+
+  <label for="RequestReason:" class="label-design">Request Reason:</label>
+      <textarea name="Request-Reason" class="form-design" required="required"></textarea>
+
+  </div>
+
+  <div class="form-element">
+    
+ <input type="submit" value="Submit" class="form-design">
+
+  </div>
+
+</form> 
+
+
+</div>
+
+</div>
+
+
+
+<!-- End of form -->
+
+
+
+
+</div>
+
+
+</body>
+
+</html>
