@@ -20,23 +20,27 @@
 
   padding-top: 15px;
   font-family: Sans-serif;
+  text-align: center;
 
 }
 
 .form-design{
 
-  width: 200px;
+  width: 50%;
   height: 25px;
 
 }
 
 .form-element{
   padding: 20px;
+  text-align: center;
 }
 
 
 .label-design{
   padding: 10px;
+  display: inline-block;
+  width: 30%;
 }
 
 #form-S{
@@ -47,12 +51,8 @@
   display: block;
   margin-left: auto;
   margin-right: auto;
-
-}
-
-#form-S{
   background-color: #D3D3D3;
-}
+
 
 
 
@@ -107,7 +107,7 @@
  <div class="form-element">
 
   <label for="StartDate:" class="label-design">Start Date:</label>
-      <input id="startdate" type="date" data-date="" name="Start-Date" data-date-format="DD MM YYYY" value=""></input>
+      <input id="startdate" type="date" data-date="" name="Start-Date" data-date-format="DD MM YYYY" value="" class="form-design"></input>
   </div>
 
   <div class="form-element">
@@ -120,7 +120,7 @@
   <div class="form-element">
 
   <label for="RequestReason:" class="label-design">Request Reason:</label>
-      <textarea name="Request-Reason" class="form-design" required="required"></textarea>
+      <textarea cols="50" rows="10" name="Request-Reason" required="required"></textarea>
 
   </div>
 
