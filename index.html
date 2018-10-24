@@ -2,6 +2,7 @@
 
 <html lang="en">
   <head>
+    
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -9,6 +10,10 @@
    
 <!--- Beginning of Stylesheet -->
     <style type="text/css">
+
+body{
+  font-family: Sans-serif;
+}
       
  #rc-header{
   text-align: center;
@@ -20,7 +25,6 @@
 
   padding-top: 15px;
   font-family: Sans-serif;
-  text-align: center;
 
 }
 
@@ -46,12 +50,26 @@
 #form-S{
 
   border: 3px solid black;
-  width: 30%;
+  width: 50%;
   text-align: center;
   display: block;
   margin-left: auto;
   margin-right: auto;
   background-color: #D3D3D3;
+
+}
+
+  #submitButton1{
+
+    padding-bottom: 35px;
+
+  }
+
+  #submitButton{
+
+    height: 40px;
+    width: 50%;
+  }
 
 
 
@@ -68,34 +86,35 @@
   <body>
 <!-- Main Container contents -->
 
+
+
     <h1 id='rc-header' align="center">Roll Call App</h1>
     
 
 <!-- Start of form -->
 <div id='form-S' class="container">
 
-<form id="form-outlook" name="rosterForm" enctype="text/plain" method="POST" action="mailto:burnz@amazon.com?subject=Roster%20Request">
 
  <div class="form-element">
 
   <label for="userAlias" class="label-design">User:</label>
-      <input type="text" class="form-design" placeholder="User Alias" name="User" required="required">
+      <input type="text" class="form-design" placeholder="User Alias" name="User" required="required" id="alias">
 
   </div>
 <div class="form-element">
    <label for="sel1" class="label-design">Request Type:</label>
-      <select class="form-design" name="Request-Type" required="required">
+      <select class="form-design" name="Request-Type" required="required" id="Request-Type">
       <option value="" disabled selected>Select your option</option>
-      <option>Vacation</option>
+      <option>On Vacation</option>
       <option>Sick</option>
-      <option>Training</option>
+      <option>In Training</option>
       </select>
 </div>
 
 <div class="form-element">
 
     <label for="sel1" class="label-design">My Shift:</label>
-      <select class="form-design" name="Weekly-Shift" required="required">
+      <select class="form-design" name="Weekly-Shift" required="required" id="Weekly-Shift">
       <option value="" disabled selected>Select your option</option>
       <option>Sun - Thurs</option>
       <option>Tues - Sat</option>
@@ -113,26 +132,52 @@
   <div class="form-element">
 
   <label for="No-Days:" class="label-design">Duration:</label>
-      <input type="number" class="form-design" placeholder="Duration" name="No-Days" required="required">
+      <input type="number" class="form-design" placeholder="Duration" name="No-Days" required="required" id="Duration">
 
   </div>
 
   <div class="form-element">
 
   <label for="RequestReason:" class="label-design">Request Reason:</label>
-      <textarea cols="50" rows="10" name="Request-Reason" required="required"></textarea>
+      <textarea cols="75" rows="10" name="Request-Reason" id="Request-Reason" required="required"></textarea>
 
   </div>
 
   <div class="form-element">
-    
- <input type="submit" value="Submit" class="form-design">
 
   </div>
 
-</form> 
+
+<div id="submitButton1">
+  
+  <button id="submitButton" onClick="execute();">Submit</button>
+
+</div>
 
 
+<script type="text/javascript">
+
+  function execute(){
+
+    var to = "burnz@amazon.com";
+    var cc = "";
+    var bcc = "";
+    var subject = "Roster%20Request";
+    //var body = "test123";
+
+    var url = "mailto:" + to + "?";
+    url += "subject=" + subject;
+    url += "&body=" + "Hi, %0A" + "%0A" + "I'm requesting some time off due to me being " + document.getElementById("Request-Type").value.replace('\n', '%0A') + "." + "%0A";
+    url += "My shift for week is " + document.getElementById("Weekly-Shift").value.replace('\n', '%0A') + "." + "%0A";
+    url += "The first date I need off is " + document.getElementById("startdate").value.replace('\n', '%0A') + " for a total of " + document.getElementById("Duration").value.replace('\n', '%0A') + " days." + "%0A" + "%0A" + "Additional information:" + "%0A" + document.getElementById("Request-Reason").value.replace('\n', '%0A') + "%0A" + "%0A" + "Many thanks," + "%0A" + document.getElementById("alias").value.replace('\n', '%0A');
+
+
+
+    var win = window.open(url, '_target');
+    win.focus();
+
+  }
+</script>
 </div>
 
 </div>
