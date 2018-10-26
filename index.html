@@ -6,7 +6,6 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <Link rel=stylesheet type="text/css" href="css/style.css">
    
 <!--- Beginning of Stylesheet -->
     <style type="text/css">
@@ -98,7 +97,7 @@ body{
  <div class="form-element">
 
   <label for="userAlias" class="label-design">User:</label>
-      <input type="text" class="form-design" placeholder="User Alias" name="User" required="required" id="alias">
+      <input type="text" class="form-design" placeholder="User Alias" name="User" required="required" id="alias" required="Required">
 
   </div>
 <div class="form-element">
@@ -139,7 +138,7 @@ body{
   <div class="form-element">
 
   <label for="RequestReason:" class="label-design">Request Reason:</label>
-      <textarea cols="75" rows="10" name="Request-Reason" id="Request-Reason" required="required"></textarea>
+      <textarea rows="10" name="Request-Reason" id="Request-Reason" required="required" style="width: 50%"></textarea>
 
   </div>
 
@@ -164,20 +163,51 @@ body{
     var bcc = "";
     var subject = "Roster%20Request";
     //var body = "test123";
+     var json = {
+
+      user : document.getElementById("alias").value,
+      requestType : document.getElementById("Request-Type").value, 
+      shift : document.getElementById("Weekly-Shift").value,
+      startdate : document.getElementById("startdate").value,
+      Duration : document.getElementById("Duration").value,
+      RequestReason : document.getElementById("Request-Reason").value
+
+
+     } 
+
+    var jsonText = JSON.stringify(json, null, 4);
 
     var url = "mailto:" + to + "?";
     url += "subject=" + subject;
     url += "&body=" + "Hi, %0A" + "%0A" + "I'm requesting some time off due to me being " + document.getElementById("Request-Type").value.replace('\n', '%0A') + "." + "%0A";
     url += "My shift for week is " + document.getElementById("Weekly-Shift").value.replace('\n', '%0A') + "." + "%0A";
-    url += "The first date I need off is " + document.getElementById("startdate").value.replace('\n', '%0A') + " for a total of " + document.getElementById("Duration").value.replace('\n', '%0A') + " days." + "%0A" + "%0A" + "Additional information:" + "%0A" + document.getElementById("Request-Reason").value.replace('\n', '%0A') + "%0A" + "%0A" + "Many thanks," + "%0A" + document.getElementById("alias").value.replace('\n', '%0A');
+    url += "The first date I need off is " + document.getElementById("startdate").value.replace('\n', '%0A') + " for a total of " + document.getElementById("Duration").value.replace('\n', '%0A') + " days." + "%0A" + "%0A" + "Additional information:" + "%0A" + document.getElementById("Request-Reason").value.replace('\n', '%0A') + "%0A" + "%0A" + "Many thanks," + "%0A" + document.getElementById("alias").value.replace('\n', '%0A') + "%0A" + "%0A" + "%0A" + "-----------------------------------------------------" + "%0A" + "%0A" + "JSON: " + "%0A" + "%0A" + jsonText;
 
-
-
+    
+    
     var win = window.open(url, '_target');
     win.focus();
 
+
   }
+
+  function formValidation(){
+
+
+
+  }
+
+
+
+
+
+  
+
 </script>
+
+
+
+
 </div>
 
 </div>
