@@ -77,6 +77,35 @@ body{
 
 <!-- END OF STYLE SHEET -->
 
+<script type="text/javascript">
+  
+function formValidation() {
+
+  var alias = document.getElementById("alias");
+  var reqType = document.getElementById("Request-Type");
+  var wShift = document.getElementById("Weekly-Shift");
+  var sDate = document.getElementById("startdate");
+  var dur = document.getElementById("Duration");
+  var rReason = document.getElementById("Request-Reason");
+
+  if (alias == null || alias == "", 
+     reqType == null || reqType == "", 
+     wShift == null || wShift == "", 
+     sDate == null || sDate == "", 
+     dur == null || dur == "", 
+     rReason == null || rReason == "") {
+     
+      alert("Please Fill All Required Field");
+
+            return true; 
+               } else {
+                  
+                return false;
+                
+                }
+            }
+      
+</script>
 
   </head>
 
@@ -96,13 +125,17 @@ body{
 
  <div class="form-element">
 
+
+
+  <form action="javascript:execute();">
+
   <label for="userAlias" class="label-design">User:</label>
-      <input type="text" class="form-design" placeholder="User Alias" name="User" required="required" id="alias" required="Required">
+      <input type="text" class="form-design" placeholder="User Alias" name="User" onclick="return formValidation();" id="alias" required="required">
 
   </div>
 <div class="form-element">
    <label for="sel1" class="label-design">Request Type:</label>
-      <select class="form-design" name="Request-Type" required="required" id="Request-Type">
+      <select class="form-design" name="Request-Type" required="required" id="Request-Type" onclick="return formValidation();">
       <option value="" disabled selected>Select your option</option>
       <option>On Vacation</option>
       <option>Sick</option>
@@ -113,7 +146,7 @@ body{
 <div class="form-element">
 
     <label for="sel1" class="label-design">My Shift:</label>
-      <select class="form-design" name="Weekly-Shift" required="required" id="Weekly-Shift">
+      <select class="form-design" name="Weekly-Shift" required="required" id="Weekly-Shift" onclick="return formValidation();">
       <option value="" disabled selected>Select your option</option>
       <option>Sun - Thurs</option>
       <option>Tues - Sat</option>
@@ -125,20 +158,20 @@ body{
  <div class="form-element">
 
   <label for="StartDate:" class="label-design">Start Date:</label>
-      <input id="startdate" type="date" data-date="" name="Start-Date" data-date-format="DD MM YYYY" value="" class="form-design"></input>
+      <input id="startdate" type="date" data-date="" name="Start-Date" data-date-format="DD MM YYYY" value="" class="form-design" onclick="return formValidation();"></input>
   </div>
 
   <div class="form-element">
 
   <label for="No-Days:" class="label-design">Duration:</label>
-      <input type="number" class="form-design" placeholder="Duration" name="No-Days" required="required" id="Duration">
+      <input type="number" class="form-design" placeholder="Duration" name="No-Days" required="required" id="Duration" onclick="return formValidation();">
 
   </div>
 
   <div class="form-element">
 
   <label for="RequestReason:" class="label-design">Request Reason:</label>
-      <textarea rows="10" name="Request-Reason" id="Request-Reason" required="required" style="width: 50%"></textarea>
+      <textarea rows="10" name="Request-Reason" id="Request-Reason" required="required" style="width: 50%" onclick="return formValidation();"></textarea>
 
   </div>
 
@@ -149,16 +182,26 @@ body{
 
 <div id="submitButton1">
   
-  <button id="submitButton" onClick="execute();">Submit</button>
+  <button type="Submit" id="submitButton" onClick="execute();">Submit</button>
+
+</form>
+
+
+
+
+
+
 
 </div>
 
 
 <script type="text/javascript">
 
-  function execute(){
+ function execute() {
 
-    var to = "burnz@amazon.com";
+if (formValidation() === false){
+
+ var to = "burnz@amazon.com";
     var cc = "";
     var bcc = "";
     var subject = "Roster%20Request";
@@ -189,19 +232,12 @@ body{
     win.focus();
 
 
+}
+
+   
+
+
   }
-
-  function formValidation(){
-
-
-
-  }
-
-
-
-
-
-  
 
 </script>
 
