@@ -56,29 +56,59 @@
     <!-- END OF STYLE SHEET -->
 
     <script type="text/javascript">
-        function formValidation() {
 
+        
 
-            if (document.getElementById('alias').value == "",
-                document.getElementById('Request-Type').value == "",
-                document.getElementById('Weekly-Shift').value == "",
-                document.getElementById('startdate').value == "",
-                document.getElementById('Duration').value == "",
-                document.getElementById('Request-Reason').value == "")
-            {
-                     alert("Please Fill All Required Fields");
+        function checkIfEmpty(){
+
+             var letters = /^[A-Za-z]+$/;
+
+             console.log(document.getElementById('alias').value);
+
+            if (
+                document.getElementById('alias').value == "" ||
+                document.getElementById('Request-Reason').value == "" ||   
+                document.getElementById('Request-Type').value == "" ||
+                document.getElementById('Weekly-Shift').value == "" || 
+                document.getElementById('startdate').value == "" || 
+                document.getElementById('Duration').value == "" 
+                
+                ) {
+
+                alert("Please Fill All Required Fields");
                 console.log("form did not validate");
+                
                 return false;
+                
             } else {
-                console.log("form validated");
+
+                 console.log("form validated");
                 return true;
             }
+        }
+
+        function onlyText(){
+
+            var letters = /^[A-Za-z]+$/;
+      if(document.getElementById('alias').value.match(letters))
+      {
+      console.log('includes only text - accepted');
+      return true;
+      }
+      else
+      {
+      alert("your alias can only contain letters!");
+      console.log('Please input alphabet characters only');
+      return false;
 
         }
 
+    }
 
+        
 
-           
+        
+
         
     </script>
 
@@ -108,7 +138,7 @@
         <div class="form-element">
             <label for="sel1" class="label-design">Request Type:</label>
             <select class="form-design" name="Request-Type" required="required" id="Request-Type">
-                <option value="" disabled selected>Select your option</option>
+                <option value="" disabled selected id="dis">Select your option</option>
                 <option>On Vacation</option>
                 <option>Sick</option>
                 <option>In Training</option>
@@ -119,7 +149,7 @@
 
             <label for="sel1" class="label-design">My Shift:</label>
             <select class="form-design" name="Weekly-Shift" required="required" id="Weekly-Shift">
-                <option value="" disabled selected>Select your option</option>
+                <option value="" disabled selected id="dis">Select your option</option>
                 <option>Sun - Thurs</option>
                 <option>Tues - Sat</option>
                 <option>Mon - Fri </option>
@@ -164,9 +194,10 @@
 
 
         <script type="text/javascript">
+
             function execute() {
                 console.log("inside exe statement");
-                if (formValidation() == true) {
+                if (checkIfEmpty() && onlyText() == true) {
                     console.log("inside formval in exe");
                     var to = "burnz@amazon.com";
                     var cc = "";
