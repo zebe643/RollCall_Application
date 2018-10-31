@@ -107,6 +107,22 @@
 
         }
 
+        function onlyTextandNumbers() {
+
+            var lettersAndNumbers = /^[0-9a-zA-Z]+$/;
+
+            if (document.getElementById('Request-Reason').value.match(lettersAndNumbers)) {
+                console.log('includes only text or numbers - accepted');
+                return true;
+            } else {
+                alert("The Request Reason field can only contain letters and numbers!");
+                console.log('Please input alphanumeric characters only');
+                return false;
+
+            }
+
+        }
+
         function validDate(){
 
             var newDateFormat = dateFormat();
@@ -128,6 +144,20 @@
 
 
         }
+
+        function validDuration(){
+
+            if(document.getElementById("Duration").value < 0.5){
+                alert("Duration cannot be less than 0.5 days!");
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+
+
+
 
 
     </script>
@@ -179,7 +209,7 @@
 
         <div class="form-element">
 
-            <label for="StartDate:" class="label-design">Start Date:</label>
+            <label for="StartDate:" class="label-design">Start Date: (MM/DD/YYYY)</label>
             <input id="startdate" type="date" name="Start-Date" data-date-format="DD/MM/YYYY" placeholder="DD-MM-YYYY" class="form-design"></input>
         </div>
 
@@ -231,7 +261,7 @@
 
 
                 console.log("inside exe statement");
-                if (checkIfEmpty() && onlyText() && validDate() == true) {
+                if (checkIfEmpty() && onlyText() && validDate() && validDuration() && onlyTextandNumbers() == true) {
                     console.log("inside formval in exe");
                     var to = "burnz@amazon.com";
                     var cc = "";
