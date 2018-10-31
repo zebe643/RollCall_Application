@@ -123,43 +123,50 @@
 
         }
 
-        function validDate(){
+        function validDate() {
 
             var newDateFormat = dateFormat();
 
             var d1 = newDateFormat.split("/");
 
             if (d1[2] > (new Date().getFullYear() + 1) || d1[2] < (new Date().getFullYear() - 1)) {
-                console.log(d1[2] + " is less than or greater than " + (new Date().getFullYear() + 1) + " or " + (new Date().getFullYear() - 1)) ;
+                console.log(d1[2] + " is less than or greater than " + (new Date().getFullYear() + 1) + " or " + (new Date().getFullYear() - 1));
                 console.log("date out of bounds!");
                 alert("Please ensure date selected falls within 1 year of the current date");
                 return false;
 
-            }   else {
-                console.log(d1[2] + " is within " + (new Date().getFullYear() + 1) + " or " + (new Date().getFullYear() - 1)) ;
+            } else {
+                console.log(d1[2] + " is within " + (new Date().getFullYear() + 1) + " or " + (new Date().getFullYear() - 1));
                 console.log("date is allowed!");
                 return true;
-                
+
+            }
+
+
+        }
+
+        function validDuration() {
+
+            console.log(document.getElementById("Duration").value % 1);
+
+            if (document.getElementById("Duration").value % 1 == 0 && document.getElementById("Duration").value >= 0.5) {
+                console.log("remainder is 0, accepted, returns true");
+                return true;
+
+            } else {
+                if (document.getElementById("Duration").value % 1 == 0.5) {
+                    console.log("remainder ends in 0.5, accepted, returns true")
+                    return true;
+                } else {
+
+                    alert("Duration can only be a full or half days");
+                    return false;
+
+
                 }
 
-
-        }
-
-        function validDuration(){
-
-            if(document.getElementById("Duration").value < 0.5){
-                alert("Duration cannot be less than 0.5 days!");
-                return false;
-            } else {
-                return true;
             }
         }
-
-
-
-
-
-
     </script>
 
 </head>
@@ -318,4 +325,4 @@
 
 </body>
 
-</html>
+</html></html>
