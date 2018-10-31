@@ -13,28 +13,34 @@
         body {
             font-family: Sans-serif;
         }
+
         #rc-header {
             text-align: center;
             font-size: 40px;
             font-family: Sans-serif;
         }
+
         #form-outlook {
             padding-top: 15px;
             font-family: Sans-serif;
         }
+
         .form-design {
             width: 50%;
             height: 25px;
         }
+
         .form-element {
             padding: 20px;
             text-align: center;
         }
+
         .label-design {
             padding: 10px;
             display: inline-block;
             width: 30%;
         }
+
         #form-S {
             border: 3px solid black;
             width: 50%;
@@ -44,9 +50,11 @@
             margin-right: auto;
             background-color: #D3D3D3;
         }
+
         #submitButton1 {
             padding-bottom: 35px;
         }
+
         #submitButton {
             height: 40px;
             width: 50%;
@@ -56,58 +64,48 @@
     <!-- END OF STYLE SHEET -->
 
     <script type="text/javascript">
+        function checkIfEmpty() {
 
-        function checkIfEmpty(){
+            var letters = /^[A-Za-z]+$/;
 
-             var letters = /^[A-Za-z]+$/;
-
-             console.log(document.getElementById('alias').value);
+            console.log(document.getElementById('alias').value);
 
             if (
                 document.getElementById('alias').value == "" ||
-                document.getElementById('Request-Reason').value == "" ||   
+                document.getElementById('Request-Reason').value == "" ||
                 document.getElementById('Request-Type').value == "" ||
-                document.getElementById('Weekly-Shift').value == "" || 
-                document.getElementById('startdate').value == "" || 
-                document.getElementById('Duration').value == "" 
-                
-                ) {
+                document.getElementById('Weekly-Shift').value == "" ||
+                document.getElementById('startdate').value == "" ||
+                document.getElementById('Duration').value == ""
+
+            ) {
 
                 alert("Please Fill All Required Fields");
                 console.log("form did not validate");
-                
+
                 return false;
-                
+
             } else {
 
-                 console.log("form validated");
+                console.log("form validated");
                 return true;
             }
         }
 
-        function onlyText(){
+        function onlyText() {
 
             var letters = /^[A-Za-z]+$/;
-      if(document.getElementById('alias').value.match(letters))
-      {
-      console.log('includes only text - accepted');
-      return true;
-      }
-      else
-      {
-      alert("your alias can only contain letters!");
-      console.log('Please input alphabet characters only');
-      return false;
+            if (document.getElementById('alias').value.match(letters)) {
+                console.log('includes only text - accepted');
+                return true;
+            } else {
+                alert("your alias can only contain letters!");
+                console.log('Please input alphabet characters only');
+                return false;
+
+            }
 
         }
-
-    }
-
-        
-
-        
-
-        
     </script>
 
 </head>
@@ -158,7 +156,7 @@
         <div class="form-element">
 
             <label for="StartDate:" class="label-design">Start Date:</label>
-            <input id="startdate" type="date" name="Start-Date" data-date-format="DD/MM/YYYY" placeholder="DD-MM-YYYY"class="form-design"></input>
+            <input id="startdate" type="date" name="Start-Date" data-date-format="DD/MM/YYYY" placeholder="DD-MM-YYYY" class="form-design"></input>
         </div>
 
         <div class="form-element">
@@ -189,21 +187,19 @@
 
 
         <script type="text/javascript">
-
-
-            function dateFormat(){
+            function dateFormat() {
 
                 var oldDate = new Date(document.getElementById("startdate").value);
                 var month = oldDate.getMonth() + 1;
                 var day = oldDate.getDate();
                 var year = oldDate.getFullYear();
                 var newDate = day + "/" + month + "/" + year;
-                
+
                 return newDate;
 
             }
 
-            
+
 
             function execute() {
 
@@ -227,7 +223,7 @@
                         RequestReason: document.getElementById("Request-Reason").value
 
 
-            }
+                    }
 
 
                     var jsonText = JSON.stringify(json, null, 4);
@@ -246,7 +242,7 @@
                     win.focus();
 
 
-                } 
+                }
 
             }
         </script>
