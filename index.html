@@ -57,8 +57,6 @@
 
     <script type="text/javascript">
 
-        
-
         function checkIfEmpty(){
 
              var letters = /^[A-Za-z]+$/;
@@ -187,15 +185,31 @@
             <button id="submitButton" onClick="execute()">Submit</button>
 
 
-
-
-
         </div>
 
 
         <script type="text/javascript">
 
+
+            function dateFormat(){
+
+                var oldDate = new Date(document.getElementById("startdate").value);
+                var month = oldDate.getMonth() + 1;
+                var day = oldDate.getDate();
+                var year = oldDate.getFullYear();
+                var newDate = day + "/" + month + "/" + year;
+                
+                return newDate;
+
+            }
+
+            
+
             function execute() {
+
+                var newDateFormat = dateFormat();
+
+
                 console.log("inside exe statement");
                 if (checkIfEmpty() && onlyText() == true) {
                     console.log("inside formval in exe");
@@ -203,26 +217,28 @@
                     var cc = "";
                     var bcc = "";
                     var subject = "Roster%20Request";
-                    //var body = "test123";
                     var json = {
 
                         user: document.getElementById("alias").value,
                         requestType: document.getElementById("Request-Type").value,
                         shift: document.getElementById("Weekly-Shift").value,
-                        startdate: document.getElementById("startdate").value,
+                        startdate: newDateFormat,
                         Duration: document.getElementById("Duration").value,
                         RequestReason: document.getElementById("Request-Reason").value
 
 
-                    }
+            }
+
 
                     var jsonText = JSON.stringify(json, null, 4);
+
+                    var newDate = document.getElementById("startdate");
 
                     var url = "mailto:" + to + "?";
                     url += "subject=" + subject;
                     url += "&body=" + "Hi, %0A" + "%0A" + "I'm requesting some time off due to me being " + document.getElementById("Request-Type").value.replace('\n', '%0A') + "." + "%0A";
                     url += "My shift for week is " + document.getElementById("Weekly-Shift").value.replace('\n', '%0A') + "." + "%0A";
-                    url += "The first date I need off is " + document.getElementById("startdate").value.replace('\n', '%0A') + " for a total of " + document.getElementById("Duration").value.replace('\n', '%0A') + " days." + "%0A" + "%0A" + "Additional information:" + "%0A" + document.getElementById("Request-Reason").value.replace('\n', '%0A') + "%0A" + "%0A" + "Many thanks," + "%0A" + document.getElementById("alias").value.replace('\n', '%0A') + "%0A" + "%0A" + "%0A" + "-----------------------------------------------------" + "%0A" + "%0A" + "JSON: " + "%0A" + "%0A" + jsonText;
+                    url += "The first date I need off is " + newDateFormat + " for a total of " + document.getElementById("Duration").value.replace('\n', '%0A') + " days." + "%0A" + "%0A" + "Additional information:" + "%0A" + document.getElementById("Request-Reason").value.replace('\n', '%0A') + "%0A" + "%0A" + "Many thanks," + "%0A" + document.getElementById("alias").value.replace('\n', '%0A') + "%0A" + "%0A" + "%0A" + "-----------------------------------------------------" + "%0A" + "%0A" + "JSON: " + "%0A" + "%0A" + jsonText;
 
 
 
