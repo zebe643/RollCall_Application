@@ -3,44 +3,36 @@
 <html lang="en">
 
 <head>
-
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
     <!--- Beginning of Stylesheet -->
     <style type="text/css">
         body {
             font-family: Sans-serif;
         }
-
         #rc-header {
             text-align: center;
             font-size: 40px;
             font-family: Sans-serif;
         }
-
         #form-outlook {
             padding-top: 15px;
             font-family: Sans-serif;
         }
-
         .form-design {
             width: 50%;
             height: 25px;
         }
-
         .form-element {
             padding: 20px;
             text-align: center;
         }
-
         .label-design {
             padding: 10px;
             display: inline-block;
             width: 30%;
         }
-
         #form-S {
             border: 3px solid black;
             width: 50%;
@@ -50,27 +42,20 @@
             margin-right: auto;
             background-color: #D3D3D3;
         }
-
         #submitButton1 {
             padding-bottom: 35px;
         }
-
         #submitButton {
             height: 40px;
             width: 50%;
         }
     </style>
-
     <!-- END OF STYLE SHEET -->
-
     <script type="text/javascript">
 
         function checkIfEmpty() {
-
             var letters = /^[A-Za-z]+$/;
-
             console.log(document.getElementById('alias').value);
-
             if (
                 document.getElementById('alias').value == "" ||
                 document.getElementById('Request-Reason').value == "" ||
@@ -78,23 +63,17 @@
                 document.getElementById('Weekly-Shift').value == "" ||
                 document.getElementById('startdate').value == "" ||
                 document.getElementById('Duration').value == ""
-
             ) {
-
                 alert("Please Fill All Required Fields");
                 console.log("form did not validate");
-
                 return false;
-
             } else {
-
                 console.log("form validated");
                 return true;
             }
         }
 
         function onlyText() {
-
             var letters = /^[A-Za-z]+$/;
             if (document.getElementById('alias').value.match(letters)) {
                 console.log('includes only text - accepted');
@@ -103,15 +82,11 @@
                 alert("your alias can only contain letters!");
                 console.log('Please input alphabet characters only');
                 return false;
-
             }
-
         }
 
         function onlyTextandNumbers() {
-
             var lettersAndNumbers = /^[0-9a-zA-Z]+$/;
-
             if (document.getElementById('Request-Reason').value.match(lettersAndNumbers)) {
                 console.log('includes only text or numbers - accepted');
                 return true;
@@ -119,104 +94,64 @@
                 alert("The Request Reason field can only contain letters and numbers!");
                 console.log('Please input alphanumeric characters only');
                 return false;
-
             }
-
         }
 
         function escapeChar(){
-
-        var userString = document.getElementById("Request-Reason").value;
-
-        console.log(userString);
-
-                      // Create a DOM Text node:
-        var text_node = document.createTextNode(userString);
-
-        // Get the HTML element where you want to insert the text into:
-        var elem = document.getElementById('Request-Reason');
-
-        // Optional: clear its old contents
-        elem.innerHTML = '';
-
-        // Append the text node into it:
-        elem.appendChild(text_node);
-
-        console.log(text_node);
-
-        var userString = text_node;
-
-        return userString;
-
-
-
+            var userString = document.getElementById("Request-Reason").value;
+            console.log(userString);
+            var text_node = document.createTextNode(userString);
+            var elem = document.getElementById('Request-Reason');
+            elem.innerHTML = '';
+            elem.appendChild(text_node);
+            console.log(text_node);
+            var userString = text_node;
+            return userString;
         }
         
 
         function validDate() {
-
             var newDateFormat = dateFormat();
-
             var d1 = newDateFormat.split("/");
-
             if (d1[2] > (new Date().getFullYear() + 1) || d1[2] < (new Date().getFullYear() - 1)) {
                 console.log(d1[2] + " is less than or greater than " + (new Date().getFullYear() + 1) + " or " + (new Date().getFullYear() - 1));
                 console.log("date out of bounds!");
                 alert("Please ensure date selected falls within 1 year of the current date");
                 return false;
-
             } else {
                 console.log(d1[2] + " is within " + (new Date().getFullYear() + 1) + " or " + (new Date().getFullYear() - 1));
                 console.log("date is allowed!");
                 return true;
-
             }
-
-
         }
 
         function validDuration() {
-
             console.log(document.getElementById("Duration").value % 1);
-
             if (document.getElementById("Duration").value % 1 == 0 && document.getElementById("Duration").value >= 0.5) {
                 console.log("remainder is 0, accepted, returns true");
                 return true;
-
             } else {
                 if (document.getElementById("Duration").value % 1 == 0.5) {
                     console.log("remainder ends in 0.5, accepted, returns true")
                     return true;
                 } else {
-
                     alert("Duration can only be a full or half days");
                     return false;
-
-
                 }
-
             }
         }
 
             function dateFormat() {
-
                 var oldDate = new Date(document.getElementById("startdate").value);
                 var month = oldDate.getMonth() + 1;
                 var day = oldDate.getDate();
                 var year = oldDate.getFullYear();
                 var newDate = day + "/" + month + "/" + year;
-
                 return newDate;
-
             }
 
-
-
             function execute() {
-
                 var newDateFormat = dateFormat();
-
-
                 console.log("inside exe statement");
                 if (checkIfEmpty() && onlyText() && validDate() && validDuration() == true) {
                     console.log("inside formval in exe");
@@ -225,62 +160,38 @@
                     var bcc = "";
                     var subject = "Roster%20Request";
                     var json = {
-
                         user: document.getElementById("alias").value,
                         requestType: document.getElementById("Request-Type").value,
                         shift: document.getElementById("Weekly-Shift").value,
                         startdate: newDateFormat,
                         Duration: document.getElementById("Duration").value,
                         RequestReason: document.getElementById("Request-Reason").value
-
-
                     }
-
-
                     var jsonText = JSON.stringify(json, null, 4);
-
                     var newDate = document.getElementById("startdate");
-
                     var url = "mailto:" + to + "?";
+
                     url += "subject=" + subject;
                     url += "&body=" + "Hi, %0A" + "%0A" + "I'm requesting some time off due to me being " + document.getElementById("Request-Type").value.replace('\n', '%0A') + "." + "%0A";
                     url += "My shift for week is " + document.getElementById("Weekly-Shift").value.replace('\n', '%0A') + "." + "%0A";
                     url += "The first date I need off is " + newDateFormat + " for a total of " + document.getElementById("Duration").value.replace('\n', '%0A') + " days." + "%0A" + "%0A" + "Additional information:" + "%0A" + document.getElementById("Request-Reason").value.replace('\n', '%0A') + "%0A" + "%0A" + "Many thanks," + "%0A" + document.getElementById("alias").value.replace('\n', '%0A') + "%0A" + "%0A" + "%0A" + "-----------------------------------------------------" + "%0A" + "%0A" + "JSON: " + "%0A" + "%0A" + jsonText;
-
-
-
+                    
                     var win = window.open(url, '_target');
                     win.focus();
-
-
                 }
-
             }
             
     </script>
 
 </head>
-
-
-
 <body>
     <!-- Main Container contents -->
-
-
-
     <h1 id='rc-header' align="center">Roll Call App</h1>
-
-
     <!-- Start of form -->
     <div id='form-S' class="container">
-
-
         <div class="form-element">
-
-
             <label for="userAlias" class="label-design">User:</label>
             <input type="text" class="form-design" placeholder="User Alias" name="User" id="alias" required="required">
-
         </div>
         <div class="form-element">
             <label for="sel1" class="label-design">Request Type:</label>
@@ -291,9 +202,7 @@
                 <option>In Training</option>
             </select>
         </div>
-
         <div class="form-element">
-
             <label for="sel1" class="label-design">My Shift:</label>
             <select class="form-design" name="Weekly-Shift" required="required" id="Weekly-Shift">
                 <option value="" disabled selected id="dis">Select your option</option>
@@ -301,58 +210,28 @@
                 <option>Tues - Sat</option>
                 <option>Mon - Fri </option>
             </select>
-
         </div>
-
         <div class="form-element">
-
             <label for="StartDate:" class="label-design">Start Date: (MM/DD/YYYY)</label>
             <input id="startdate" type="date" name="Start-Date" data-date-format="DD/MM/YYYY" placeholder="DD-MM-YYYY" class="form-design"></input>
         </div>
-
         <div class="form-element">
-
             <label for="No-Days:" class="label-design">Duration:</label>
             <input type="number" class="form-design" placeholder="Duration" name="No-Days" required="required" id="Duration">
-
         </div>
-
         <div class="form-element">
-
             <label for="RequestReason:" class="label-design">Request Reason:</label>
             <textarea rows="10" name="Request-Reason" id="Request-Reason" required="required" style="width: 50%"></textarea>
-
         </div>
-
         <div class="form-element">
-
         </div>
-
-
         <div id="submitButton1">
-
             <button id="submitButton" onClick="execute()">Submit</button>
-
-
         </div>
-
-
-        <script type="text/javascript">
-
-        </script>
-
-
-
-
     </div>
-
     </div>
-
     </div>
-
-
 </body>
-
 </html>
 
 
