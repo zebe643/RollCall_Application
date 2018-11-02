@@ -64,6 +64,7 @@
     <!-- END OF STYLE SHEET -->
 
     <script type="text/javascript">
+
         function checkIfEmpty() {
 
             var letters = /^[A-Za-z]+$/;
@@ -123,6 +124,35 @@
 
         }
 
+        function escapeChar(){
+
+        var userString = document.getElementById("Request-Reason").value;
+
+        console.log(userString);
+
+                      // Create a DOM Text node:
+        var text_node = document.createTextNode(userString);
+
+        // Get the HTML element where you want to insert the text into:
+        var elem = document.getElementById('Request-Reason');
+
+        // Optional: clear its old contents
+        elem.innerHTML = '';
+
+        // Append the text node into it:
+        elem.appendChild(text_node);
+
+        console.log(text_node);
+
+        var userString = text_node;
+
+        return userString;
+
+
+
+        }
+        
+
         function validDate() {
 
             var newDateFormat = dateFormat();
@@ -167,6 +197,66 @@
 
             }
         }
+
+            function dateFormat() {
+
+                var oldDate = new Date(document.getElementById("startdate").value);
+                var month = oldDate.getMonth() + 1;
+                var day = oldDate.getDate();
+                var year = oldDate.getFullYear();
+                var newDate = day + "/" + month + "/" + year;
+
+                return newDate;
+
+            }
+
+
+
+            function execute() {
+
+                var newDateFormat = dateFormat();
+
+
+                console.log("inside exe statement");
+                if (checkIfEmpty() && onlyText() && validDate() && validDuration() == true) {
+                    console.log("inside formval in exe");
+                    var to = "burnz@amazon.com";
+                    var cc = "";
+                    var bcc = "";
+                    var subject = "Roster%20Request";
+                    var json = {
+
+                        user: document.getElementById("alias").value,
+                        requestType: document.getElementById("Request-Type").value,
+                        shift: document.getElementById("Weekly-Shift").value,
+                        startdate: newDateFormat,
+                        Duration: document.getElementById("Duration").value,
+                        RequestReason: document.getElementById("Request-Reason").value
+
+
+                    }
+
+
+                    var jsonText = JSON.stringify(json, null, 4);
+
+                    var newDate = document.getElementById("startdate");
+
+                    var url = "mailto:" + to + "?";
+                    url += "subject=" + subject;
+                    url += "&body=" + "Hi, %0A" + "%0A" + "I'm requesting some time off due to me being " + document.getElementById("Request-Type").value.replace('\n', '%0A') + "." + "%0A";
+                    url += "My shift for week is " + document.getElementById("Weekly-Shift").value.replace('\n', '%0A') + "." + "%0A";
+                    url += "The first date I need off is " + newDateFormat + " for a total of " + document.getElementById("Duration").value.replace('\n', '%0A') + " days." + "%0A" + "%0A" + "Additional information:" + "%0A" + document.getElementById("Request-Reason").value.replace('\n', '%0A') + "%0A" + "%0A" + "Many thanks," + "%0A" + document.getElementById("alias").value.replace('\n', '%0A') + "%0A" + "%0A" + "%0A" + "-----------------------------------------------------" + "%0A" + "%0A" + "JSON: " + "%0A" + "%0A" + jsonText;
+
+
+
+                    var win = window.open(url, '_target');
+                    win.focus();
+
+
+                }
+
+            }
+            
     </script>
 
 </head>
@@ -248,64 +338,7 @@
 
 
         <script type="text/javascript">
-            function dateFormat() {
 
-                var oldDate = new Date(document.getElementById("startdate").value);
-                var month = oldDate.getMonth() + 1;
-                var day = oldDate.getDate();
-                var year = oldDate.getFullYear();
-                var newDate = day + "/" + month + "/" + year;
-
-                return newDate;
-
-            }
-
-
-
-            function execute() {
-
-                var newDateFormat = dateFormat();
-
-
-                console.log("inside exe statement");
-                if (checkIfEmpty() && onlyText() && validDate() && validDuration() && onlyTextandNumbers() == true) {
-                    console.log("inside formval in exe");
-                    var to = "burnz@amazon.com";
-                    var cc = "";
-                    var bcc = "";
-                    var subject = "Roster%20Request";
-                    var json = {
-
-                        user: document.getElementById("alias").value,
-                        requestType: document.getElementById("Request-Type").value,
-                        shift: document.getElementById("Weekly-Shift").value,
-                        startdate: newDateFormat,
-                        Duration: document.getElementById("Duration").value,
-                        RequestReason: document.getElementById("Request-Reason").value
-
-
-                    }
-
-
-                    var jsonText = JSON.stringify(json, null, 4);
-
-                    var newDate = document.getElementById("startdate");
-
-                    var url = "mailto:" + to + "?";
-                    url += "subject=" + subject;
-                    url += "&body=" + "Hi, %0A" + "%0A" + "I'm requesting some time off due to me being " + document.getElementById("Request-Type").value.replace('\n', '%0A') + "." + "%0A";
-                    url += "My shift for week is " + document.getElementById("Weekly-Shift").value.replace('\n', '%0A') + "." + "%0A";
-                    url += "The first date I need off is " + newDateFormat + " for a total of " + document.getElementById("Duration").value.replace('\n', '%0A') + " days." + "%0A" + "%0A" + "Additional information:" + "%0A" + document.getElementById("Request-Reason").value.replace('\n', '%0A') + "%0A" + "%0A" + "Many thanks," + "%0A" + document.getElementById("alias").value.replace('\n', '%0A') + "%0A" + "%0A" + "%0A" + "-----------------------------------------------------" + "%0A" + "%0A" + "JSON: " + "%0A" + "%0A" + jsonText;
-
-
-
-                    var win = window.open(url, '_target');
-                    win.focus();
-
-
-                }
-
-            }
         </script>
 
 
