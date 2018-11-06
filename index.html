@@ -85,30 +85,36 @@
             }
         }
 
-        function onlyTextandNumbers() {
-            var lettersAndNumbers = /^[0-9a-zA-Z]+$/;
-            if (document.getElementById('Request-Reason').value.match(lettersAndNumbers)) {
-                console.log('includes only text or numbers - accepted');
-                return true;
-            } else {
-                alert("The Request Reason field can only contain letters and numbers!");
-                console.log('Please input alphanumeric characters only');
-                return false;
-            }
-        }
+        // function onlyTextandNumbers() {
+        //     var lettersAndNumbers = /^[0-9a-zA-Z]+$/;
+        //     if (document.getElementById('Request-Reason').value.match(lettersAndNumbers)) {
+        //         console.log('includes only text or numbers - accepted');
+        //         return true;
+        //     } else {
+        //         alert("The Request Reason field can only contain letters and numbers!");
+        //         console.log('Please input alphanumeric characters only');
+        //         return false;
+        //     }
+        // }
 
-        function escapeChar(){
+        function encStr(){
             var userString = document.getElementById("Request-Reason").value;
             console.log(userString);
-            var text_node = document.createTextNode(userString);
-            var elem = document.getElementById('Request-Reason');
-            elem.innerHTML = '';
-            elem.appendChild(text_node);
-            console.log(text_node);
-            var userString = text_node;
-            return userString;
+            var encodeString = encodeURIComponent(userString);
+            encodeString.replace('\n', '%0A');
+            console.log(encodeString);
+            return encodeString;
+
         }
-        
+
+        // function encChar(){
+        //     var userString = document.getElementById("Request-Reason").value;
+        //     console.log(userString);
+        //     var encodeString = encodeURI(userString);
+        //     console.log(encodeString);
+        //     return encodeString;
+
+        // }
 
         function validDate() {
             var newDateFormat = dateFormat();
@@ -151,7 +157,10 @@
             }
 
             function execute() {
+                console.log(encStr())
                 var newDateFormat = dateFormat();
+                var encText = encStr();
+                //var encChars = encChar().replace('\n', '%0A');
                 console.log("inside exe statement");
                 if (checkIfEmpty() && onlyText() && validDate() && validDuration() == true) {
                     console.log("inside formval in exe");
@@ -165,7 +174,7 @@
                         shift: document.getElementById("Weekly-Shift").value,
                         startdate: newDateFormat,
                         Duration: document.getElementById("Duration").value,
-                        RequestReason: document.getElementById("Request-Reason").value
+                        RequestReason : encText
                     }
                     var jsonText = JSON.stringify(json, null, 4);
                     var newDate = document.getElementById("startdate");
@@ -174,13 +183,12 @@
                     url += "subject=" + subject;
                     url += "&body=" + "Hi, %0A" + "%0A" + "I'm requesting some time off due to me being " + document.getElementById("Request-Type").value.replace('\n', '%0A') + "." + "%0A";
                     url += "My shift for week is " + document.getElementById("Weekly-Shift").value.replace('\n', '%0A') + "." + "%0A";
-                    url += "The first date I need off is " + newDateFormat + " for a total of " + document.getElementById("Duration").value.replace('\n', '%0A') + " days." + "%0A" + "%0A" + "Additional information:" + "%0A" + document.getElementById("Request-Reason").value.replace('\n', '%0A') + "%0A" + "%0A" + "Many thanks," + "%0A" + document.getElementById("alias").value.replace('\n', '%0A') + "%0A" + "%0A" + "%0A" + "-----------------------------------------------------" + "%0A" + "%0A" + "JSON: " + "%0A" + "%0A" + jsonText;
+                    url += "The first date I need off is " + newDateFormat + " for a total of " + document.getElementById("Duration").value.replace('\n', '%0A') + " days." + "%0A" + "%0A" + "Additional information:" + "%0A" + encText + "%0A" + "%0A" + "Many thanks," + "%0A" + document.getElementById("alias").value.replace('\n', '%0A') + "%0A" + "%0A" + "%0A" + "-----------------------------------------------------" + "%0A" + "%0A" + "JSON: " + "%0A" + "%0A" + jsonText;
                     
                     var win = window.open(url, '_target');
                     win.focus();
                 }
             }
-            
     </script>
 
 </head>
@@ -226,7 +234,7 @@
         <div class="form-element">
         </div>
         <div id="submitButton1">
-            <button id="submitButton" onClick="execute()">Submit</button>
+            <button id="submitButton" onClick="execute(); encStr();">Submit</button>
         </div>
     </div>
     </div>
