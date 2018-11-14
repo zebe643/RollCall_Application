@@ -86,18 +86,6 @@
             }
         }
 
-        // function onlyTextandNumbers() {
-        //     var lettersAndNumbers = /^[0-9a-zA-Z]+$/;
-        //     if (document.getElementById('Request-Reason').value.match(lettersAndNumbers)) {
-        //         console.log('includes only text or numbers - accepted');
-        //         return true;
-        //     } else {
-        //         alert("The Request Reason field can only contain letters and numbers!");
-        //         console.log('Please input alphanumeric characters only');
-        //         return false;
-        //     }
-        // }
-
         function encStr(){
             var userString = document.getElementById("Request-Reason").value;
             console.log(userString);
@@ -107,15 +95,6 @@
             return encodeString;
 
         }
-
-        // function encChar(){
-        //     var userString = document.getElementById("Request-Reason").value;
-        //     console.log(userString);
-        //     var encodeString = encodeURI(userString);
-        //     console.log(encodeString);
-        //     return encodeString;
-
-        // }
 
         function validDate() {
             var newDateFormat = dateFormat();
@@ -190,11 +169,6 @@
                     win.focus();
                 }
             }
-
-            //start of AWS Pinpoint Integration
-            //initializing client
-            //AWS.config.region = "eu-west-1";
-            //var pinpoint = new AWS.Pinpoint({apiVersion: "2016-12-01"});
 
     </script>
 
