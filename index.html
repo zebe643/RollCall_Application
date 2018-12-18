@@ -7,6 +7,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
+    <script type="text/javascript" src="lib/axios/dist/axios.standalone.js"></script>
+    <script type="text/javascript" src="lib/CryptoJS/rollups/hmac-sha256.js"></script>
+    <script type="text/javascript" src="lib/CryptoJS/rollups/sha256.js"></script>
+    <script type="text/javascript" src="lib/CryptoJS/components/hmac.js"></script>
+    <script type="text/javascript" src="lib/CryptoJS/components/enc-base64.js"></script>
+    <script type="text/javascript" src="lib/url-template/url-template.js"></script>
+    <script type="text/javascript" src="lib/apiGatewayCore/sigV4Client.js"></script>
+    <script type="text/javascript" src="lib/apiGatewayCore/apiGatewayClient.js"></script>
+    <script type="text/javascript" src="lib/apiGatewayCore/simpleHttpClient.js"></script>
+    <script type="text/javascript" src="lib/apiGatewayCore/utils.js"></script>
+    <script type="text/javascript" src="apigClient.js"></script>
     <!--- Beginning of Stylesheet -->
     <style type="text/css">
         body {
@@ -56,7 +67,6 @@
 
         function checkIfEmpty() {
             var letters = /^[A-Za-z]+$/;
-            console.log(document.getElementById('alias').value);
             if (
                 document.getElementById('alias').value == "" ||
                 document.getElementById('Request-Reason').value == "" ||
@@ -66,10 +76,8 @@
                 document.getElementById('Duration').value == ""
             ) {
                 alert("Please Fill All Required Fields");
-                console.log("form did not validate");
                 return false;
             } else {
-                console.log("form validated");
                 return true;
             }
         }
@@ -77,48 +85,36 @@
         function onlyText() {
             var letters = /^[A-Za-z]+$/;
             if (document.getElementById('alias').value.match(letters)) {
-                console.log('includes only text - accepted');
                 return true;
             } else {
                 alert("your alias can only contain letters!");
-                console.log('Please input alphabet characters only');
                 return false;
             }
         }
 
         function encStr(){
             var userString = document.getElementById("Request-Reason").value;
-            console.log(userString);
             var encodeString = encodeURIComponent(userString);
             encodeString.replace('\n', '%0A');
-            console.log(encodeString);
             return encodeString;
-
         }
 
         function validDate() {
             var newDateFormat = dateFormat();
             var d1 = newDateFormat.split("/");
             if (d1[2] > (new Date().getFullYear() + 1) || d1[2] < (new Date().getFullYear() - 1)) {
-                console.log(d1[2] + " is less than or greater than " + (new Date().getFullYear() + 1) + " or " + (new Date().getFullYear() - 1));
-                console.log("date out of bounds!");
                 alert("Please ensure date selected falls within 1 year of the current date");
                 return false;
             } else {
-                console.log(d1[2] + " is within " + (new Date().getFullYear() + 1) + " or " + (new Date().getFullYear() - 1));
-                console.log("date is allowed!");
                 return true;
             }
         }
 
         function validDuration() {
-            console.log(document.getElementById("Duration").value % 1);
             if (document.getElementById("Duration").value % 1 == 0 && document.getElementById("Duration").value >= 0.5) {
-                console.log("remainder is 0, accepted, returns true");
                 return true;
             } else {
                 if (document.getElementById("Duration").value % 1 == 0.5) {
-                    console.log("remainder ends in 0.5, accepted, returns true")
                     return true;
                 } else {
                     alert("Duration can only be a full or half days");
@@ -137,17 +133,9 @@
             }
 
             function execute() {
-                console.log(encStr())
                 var newDateFormat = dateFormat();
                 var encText = encStr();
-                //var encChars = encChar().replace('\n', '%0A');
-                console.log("inside exe statement");
                 if (checkIfEmpty() && onlyText() && validDate() && validDuration() == true) {
-                    console.log("inside formval in exe");
-                    var to = "burnz@amazon.com";
-                    var cc = "";
-                    var bcc = "";
-                    var subject = "Roster%20Request";
                     var json = {
                         user: document.getElementById("alias").value,
                         requestType: document.getElementById("Request-Type").value,
@@ -157,19 +145,29 @@
                         RequestReason : encText
                     }
                     var jsonText = JSON.stringify(json, null, 4);
-                    var newDate = document.getElementById("startdate");
-                    var url = "mailto:" + to + "?";
-
-                    url += "subject=" + subject;
-                    url += "&body=" + "Hi, %0A" + "%0A" + "I'm requesting some time off due to me being " + document.getElementById("Request-Type").value.replace('\n', '%0A') + "." + "%0A";
-                    url += "My shift for week is " + document.getElementById("Weekly-Shift").value.replace('\n', '%0A') + "." + "%0A";
-                    url += "The first date I need off is " + newDateFormat + " for a total of " + document.getElementById("Duration").value.replace('\n', '%0A') + " days." + "%0A" + "%0A" + "Additional information:" + "%0A" + encText + "%0A" + "%0A" + "Many thanks," + "%0A" + document.getElementById("alias").value.replace('\n', '%0A') + "%0A" + "%0A" + "%0A" + "-----------------------------------------------------" + "%0A" + "%0A" + "JSON: " + "%0A" + "%0A" + jsonText;
+                    console.log(jsonText)
                     
-                    var win = window.open(url, '_target');
-                    win.focus();
-                }
-            }
+                    var apigClient = apigClientFactory.newClient();
 
+                    var params = {
+
+                    };
+                    var body = jsonText;
+                    var additionalParams = {
+
+                    };
+
+                    apigClient.formsubmissionPost(params, body, additionalParams)
+                        .then(function(result){
+                            console.log("success!")
+                            window.location.replace("https://s3.eu-west-1.amazonaws.com/dev-rollcall/formSuccess.html")
+                        }).catch( function(result){
+                            console.log("failure")
+                        });                    
+
+                                    }
+                                }
+            
     </script>
 
 </head>
