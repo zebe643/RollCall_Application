@@ -1,0 +1,15 @@
+{
+  "name": "rollcallAPIDev",
+  "version": "1.0.0",
+  "description": "",
+  "main": "pinpointSendMessage.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.373.0"
+  }
+}
