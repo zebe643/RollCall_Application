@@ -6,6 +6,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
     <script type="text/javascript" src="lib/axios/dist/axios.standalone.js"></script>
     <script type="text/javascript" src="lib/CryptoJS/rollups/hmac-sha256.js"></script>
@@ -64,6 +65,48 @@
     </style>
     <!-- END OF STYLE SHEET -->
     <script type="text/javascript">
+
+        const client_id = "4fnqnatdk1i2gbojiair5gcks1";
+        console.log("starting auth");
+        var authCode; //this is the code that you use to exchange it for tokens.
+        var userTokens; //This var contains all the tokens of the user (id,access,refresh) tokens.
+
+        //Function to retrieve user tokens using the Token Endpoint
+        function retrieveUserTokens() {
+            $.ajax({
+                    type: "POST",
+                    url: "https://roll-call.auth.eu-west-1.amazoncognito.com/oauth2/token",
+                    headers: {
+                        "Content-type": "application/x-www-form-urlencoded"
+                    },
+                    data: {
+                        "grant_type": "authorization_code",
+                        "code": authCode,
+                        "client_id": client_id,
+                        "redirect_uri": "https://s3-eu-west-1.amazonaws.com/dev-rollcall/webform.html"
+                    }
+                }).done(function(resultData) {
+                    if (resultData) {
+                        userTokens = resultData;
+                        document.getElementById("success").innerHTML = "Token is valid, you can stay here!"                 }
+                })
+                .fail(function(resultData) {
+                    document.getElementById("error").innerHTML = "Invalid Token -  Redirecting to Log-In Page";
+                        console.log(resultData);
+                        window.location.href = "https://roll-call.auth.eu-west-1.amazoncognito.com/login?response_type=code&client_id=4fnqnatdk1i2gbojiair5gcks1&redirect_uri=https://s3-eu-west-1.amazonaws.com/dev-rollcall/webform.html";
+                    })
+                
+        };
+                //Function to get the code from the addressbar to retrieve tokens from Cognito
+                function retrieveAuthCode() {
+                    var code = window.location.search;
+                    var codeNum = code.split("=");
+                    authCode = codeNum[1];
+                    console.log(authCode);
+
+                    retrieveUserTokens();
+                }
+
 
         function checkIfEmpty() {
             var letters = /^[A-Za-z]+$/;
@@ -157,12 +200,34 @@
 
                     };
 
+                    function confirmationMessage(){
+
+                        var confmsg = " <div style='text-align: center;'><h2>Confirmation of Request</h2></div>\
+                                        <div style='text-align: center;'><p style='display:inline'>User: </p>" + document.getElementById("alias").value + "</div>\
+                                        <div style='text-align: center;'><p style='display:inline'>Request Type: </p>" + document.getElementById("Request-Type").value + "</div>\
+                                        <div style='text-align: center;'><p style='display:inline'>Shift: </p> " + document.getElementById("Weekly-Shift").value + "</div>\
+                                        <div style='text-align: center;'><p style='display:inline'>Start Date: </p>" + dateFormat() + "</div>\
+                                        <div style='text-align: center;'><p style='display:inline'>Duration: </p>" + document.getElementById("Duration").value + "</div>\
+                                        <div style='text-align: center;'><p style='display:inline'>Request Reason: </p>" + document.getElementById("Request-Reason").value + "</div>\
+                                        <br/><br/>\
+                                        <div><a href='javascript:window.close();'><p>Click here to close the page</p></a></div>";
+                        return confmsg;
+
+                    }
+
                     apigClient.formsubmissionPost(params, body, additionalParams)
                         .then(function(result){
-                            console.log("success!")
-                            window.location.replace("https://s3.eu-west-1.amazonaws.com/dev-rollcall/formSuccess.html")
+                            console.log("success!");
+
+                            document.getElementById("messageFailure").style.display="none";
+                            document.getElementById("messageSuccess").style.display="block";
+                            document.getElementById("form-S").style.display="none";
+                            document.getElementById("messageSuccess").innerHTML = confirmationMessage();
                         }).catch( function(result){
-                            console.log("failure")
+                            console.log("failure");
+                            document.getElementById("messageFailure").style.display="block";
+                            document.getElementById("messageSuccess").style.display="none";
+                            document.getElementById("form-S").style.display="block";
                         });                    
 
                                     }
@@ -171,10 +236,19 @@
     </script>
 
 </head>
-<body>
+<body onload="retrieveAuthCode()">
+    <div>
+        <h1 id="error"></h1>
+        <h1 id="success"></h1>
+    </div>
     <!-- Main Container contents -->
     <h1 id='rc-header' align="center">Roll Call App</h1>
+
     <!-- Start of form -->
+    <div id="messageSuccess" style="display:none;" align="center">
+
+    </div>
+    <div id="messageFailure" style="display:none;">Something is going wrong :(</div>
     <div id='form-S' class="container">
         <div class="form-element">
             <label for="userAlias" class="label-design">User:</label>
