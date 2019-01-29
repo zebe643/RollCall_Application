@@ -5,14 +5,14 @@ var AWS = require('aws-sdk');
 AWS.config.update({region: 'eu-west-1'});
 var pinpointemail = new AWS.PinpointEmail({apiVersion: '2018-07-26'});
 
-function requestLeave(alias, RequestType, MyShift, StartDate, Duration, RequestReason){ 
+function requestLeave(alias, psprofile, RequestType, MyShift, StartDate, Duration, RequestReason){ 
     var confirmationEmail = {
         Content: {
             Simple: {
                 Body: {
                     Text: {
-                        Data: "Hi," + "\n\n" + "I'm requesting some time off due to me being " + RequestType + ".\n" + "My shift for the week is " + MyShift + ".\n" +
-                        "The first date I need off is " + StartDate + " for a total of " + Duration + " days" + ".\n\n" + "Additional Information: " + RequestReason.replace(/%20/g, " ") +
+                        Data: "Hi," + "\n\n" + "I'm requesting some time off for the reason: " + RequestType + ".\n" + "My shift for the week is " + MyShift + ".\n" +
+                        "The first date I need off is " + StartDate + " for a total of " + Duration + " days" + ".\n\n" +  "PS Profile: " + psprofile + "\n\n" + "Additional Information: " + unEscRReason.replace(/%20/g, " ") +
                         "\n\n" + "Many thanks," + "\n" + alias,
                         Charset: "UTF-8"
                     }
@@ -39,6 +39,7 @@ function requestLeave(alias, RequestType, MyShift, StartDate, Duration, RequestR
 
 for(var key in event){
     var user = event["user"]
+    var psProfile = event["psprofile"]
     var rType = event["requestType"]
     var shift = event["shift"]
     var sDate = event["startdate"]
@@ -46,21 +47,8 @@ for(var key in event){
     var rReason = event["RequestReason"]   
 }
 
+var unEscRReason = unescape(rReason);
 
-requestLeave(user, rType, shift, sDate, dur, rReason);
+
+requestLeave(user, psProfile, rType, shift, sDate, dur, rReason);
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -64,12 +64,39 @@
         }
     </style>
     <!-- END OF STYLE SHEET -->
+
     <script type="text/javascript">
 
-        const client_id = "4fnqnatdk1i2gbojiair5gcks1";
+        const client_id = "4fnqnatdk1i2gbojiair5gcks1"; //client ID of Cognito App Client
         console.log("starting auth");
         var authCode; //this is the code that you use to exchange it for tokens.
         var userTokens; //This var contains all the tokens of the user (id,access,refresh) tokens.
+
+        //
+        window.onload = function() {
+            //Check to see if JWT is in storage
+            if(sessionStorage.getItem('token') == null){
+                //if no token, get the token from the URL
+                retrieveAuthCode();
+            }else{
+                //if there is token, use token as auth
+                console.log("tokens are here!");
+                console.log(getTokens())
+                document.getElementById("form-S").style.display = "block";
+                document.getElementById("rc-header").style.display = "block";
+                document.getElementById ("redirect").style.display = "none"
+            }
+        }  
+
+         //Function to get the code from the addressbar to retrieve tokens from Cognito
+        function retrieveAuthCode() {
+            var code = window.location.search;
+            var codeNum = code.split("=");
+            authCode = codeNum[1];
+            console.log(authCode);
+
+            retrieveUserTokens();
+        }        
 
         //Function to retrieve user tokens using the Token Endpoint
         function retrieveUserTokens() {
@@ -88,30 +115,40 @@
                 }).done(function(resultData) {
                     if (resultData) {
                         userTokens = resultData;
-                        document.getElementById("success").innerHTML = "Token is valid, you can stay here!"                 }
+                        console.log(resultData)
+                        // save tokens to local storage
+                        sessionStorage.setItem('token', JSON.stringify(resultData));
+                        document.getElementById("form-S").style.display = "block";
+                        document.getElementById("rc-header").style.display = "block";
+                        document.getElementById("redirect").style.display = "none";
+                        document.getElementById("alias").value = getTokens();
+
+                    }
                 })
                 .fail(function(resultData) {
-                    document.getElementById("error").innerHTML = "Invalid Token -  Redirecting to Log-In Page";
                         console.log(resultData);
                         window.location.href = "https://roll-call.auth.eu-west-1.amazoncognito.com/login?response_type=code&client_id=4fnqnatdk1i2gbojiair5gcks1&redirect_uri=https://s3-eu-west-1.amazonaws.com/dev-rollcall/webform.html";
                     })
                 
         };
-                //Function to get the code from the addressbar to retrieve tokens from Cognito
-                function retrieveAuthCode() {
-                    var code = window.location.search;
-                    var codeNum = code.split("=");
-                    authCode = codeNum[1];
-                    console.log(authCode);
+        //parses id token from JWT and returns token as variable 'username'
+        function getTokens(){
+            var tokens = sessionStorage.getItem('token')
+            var base64Url = tokens.split('.')[1];
+            var base64 = base64Url.replace('-', '+').replace('_', '/');
+            var tokenResult = JSON.parse(window.atob(base64));
+            console.log(tokenResult);
+            var username = tokenResult["cognito:username"];
+            document.getElementById("alias").value = username
+            return username;
+        }
 
-                    retrieveUserTokens();
-                }
-
-
+        //validation to see if any fields have been left blank
         function checkIfEmpty() {
             var letters = /^[A-Za-z]+$/;
             if (
                 document.getElementById('alias').value == "" ||
+                document.getElementById('PS-Profile').value == "" ||
                 document.getElementById('Request-Reason').value == "" ||
                 document.getElementById('Request-Type').value == "" ||
                 document.getElementById('Weekly-Shift').value == "" ||
@@ -124,7 +161,7 @@
                 return true;
             }
         }
-
+        //ensures for the Alias field, only text can be added as AWS Alias only contail text
         function onlyText() {
             var letters = /^[A-Za-z]+$/;
             if (document.getElementById('alias').value.match(letters)) {
@@ -134,14 +171,14 @@
                 return false;
             }
         }
-
+        //encodes the text field request-reason to prevent escape characters breaking the app
         function encStr(){
             var userString = document.getElementById("Request-Reason").value;
             var encodeString = encodeURIComponent(userString);
             encodeString.replace('\n', '%0A');
             return encodeString;
         }
-
+        //validation to ensure the date entered is reasonable (no more than +1 year or -1 year)
         function validDate() {
             var newDateFormat = dateFormat();
             var d1 = newDateFormat.split("/");
@@ -152,7 +189,7 @@
                 return true;
             }
         }
-
+        //validation to ensure the duration field is a positive number and only accepts a whole or half number
         function validDuration() {
             if (document.getElementById("Duration").value % 1 == 0 && document.getElementById("Duration").value >= 0.5) {
                 return true;
@@ -165,102 +202,118 @@
                 }
             }
         }
+        //rearranges the format to dd//mm//yyyy
+        function dateFormat() {
+            var oldDate = new Date(document.getElementById("startdate").value);
+            var month = oldDate.getMonth() + 1;
+            var day = oldDate.getDate();
+            var year = oldDate.getFullYear();
+            var newDate = day + "/" + month + "/" + year;
+            return newDate;
+        }
+        //Checks to see if the above validation functions are true, and if so, call apigw client to send form data
+        function execute() {
+            var newDateFormat = dateFormat();
+            var encText = encStr();
+            if (checkIfEmpty() && onlyText() && validDate() && validDuration() == true) {
+                var json = {
+                    user: document.getElementById("alias").value,
+                    psprofile: document.getElementById("PS-Profile").value,
+                    requestType: document.getElementById("Request-Type").value,
+                    shift: document.getElementById("Weekly-Shift").value,
+                    startdate: newDateFormat,
+                    Duration: document.getElementById("Duration").value,
+                    RequestReason : encText
+                }
 
-            function dateFormat() {
-                var oldDate = new Date(document.getElementById("startdate").value);
-                var month = oldDate.getMonth() + 1;
-                var day = oldDate.getDate();
-                var year = oldDate.getFullYear();
-                var newDate = day + "/" + month + "/" + year;
-                return newDate;
             }
 
-            function execute() {
-                var newDateFormat = dateFormat();
-                var encText = encStr();
-                if (checkIfEmpty() && onlyText() && validDate() && validDuration() == true) {
-                    var json = {
-                        user: document.getElementById("alias").value,
-                        requestType: document.getElementById("Request-Type").value,
-                        shift: document.getElementById("Weekly-Shift").value,
-                        startdate: newDateFormat,
-                        Duration: document.getElementById("Duration").value,
-                        RequestReason : encText
-                    }
-                    var jsonText = JSON.stringify(json, null, 4);
-                    console.log(jsonText)
-                    
-                    var apigClient = apigClientFactory.newClient();
+                var jsonText = JSON.stringify(json, null, 4);
+                console.log(jsonText)
+        
+                var apigClient = apigClientFactory.newClient();
 
-                    var params = {
+                var params = {
 
-                    };
-                    var body = jsonText;
-                    var additionalParams = {
+                };
+                var body = jsonText;
+                var additionalParams = {
 
-                    };
+                }
 
-                    function confirmationMessage(){
+        //if form submission is sucessful, display submitted data
+        function confirmationMessage(){
 
-                        var confmsg = " <div style='text-align: center;'><h2>Confirmation of Request</h2></div>\
-                                        <div style='text-align: center;'><p style='display:inline'>User: </p>" + document.getElementById("alias").value + "</div>\
-                                        <div style='text-align: center;'><p style='display:inline'>Request Type: </p>" + document.getElementById("Request-Type").value + "</div>\
-                                        <div style='text-align: center;'><p style='display:inline'>Shift: </p> " + document.getElementById("Weekly-Shift").value + "</div>\
-                                        <div style='text-align: center;'><p style='display:inline'>Start Date: </p>" + dateFormat() + "</div>\
-                                        <div style='text-align: center;'><p style='display:inline'>Duration: </p>" + document.getElementById("Duration").value + "</div>\
-                                        <div style='text-align: center;'><p style='display:inline'>Request Reason: </p>" + document.getElementById("Request-Reason").value + "</div>\
-                                        <br/><br/>\
-                                        <div><a href='javascript:window.close();'><p>Click here to close the page</p></a></div>";
-                        return confmsg;
+            var confmsg = " <div style='text-align: center;'><h2>Confirmation of Request</h2></div>\
+                            <div style='text-align: center;'><p style='display:inline'>User: </p>" + document.getElementById("alias").value + "</div>\
+                            <div style='text-align: center;'><p style='display:inline'>PS Profile: </p>" + document.getElementById("PS-Profile").value + "</div>\
+                            <div style='text-align: center;'><p style='display:inline'>Request Type: </p>" + document.getElementById("Request-Type").value + "</div>\
+                            <div style='text-align: center;'><p style='display:inline'>Shift: </p> " + document.getElementById("Weekly-Shift").value + "</div>\
+                            <div style='text-align: center;'><p style='display:inline'>Start Date: </p>" + dateFormat() + "</div>\
+                            <div style='text-align: center;'><p style='display:inline'>Duration: </p>" + document.getElementById("Duration").value + "</div>\
+                            <div style='text-align: center;'><p style='display:inline'>Request Reason: </p>" + document.getElementById("Request-Reason").value + "</div>\
+                            <br/><br/>\
+                            <div><button value='SubmitRequest!'onClick='window.location.reload()'>Submit Another Request!</button></div>";
+            return confmsg;
 
-                    }
-
-                    apigClient.formsubmissionPost(params, body, additionalParams)
-                        .then(function(result){
-                            console.log("success!");
-
-                            document.getElementById("messageFailure").style.display="none";
-                            document.getElementById("messageSuccess").style.display="block";
-                            document.getElementById("form-S").style.display="none";
-                            document.getElementById("messageSuccess").innerHTML = confirmationMessage();
-                        }).catch( function(result){
-                            console.log("failure");
-                            document.getElementById("messageFailure").style.display="block";
-                            document.getElementById("messageSuccess").style.display="none";
-                            document.getElementById("form-S").style.display="block";
-                        });                    
-
-                                    }
-                                }
-            
+        }
+            //call to API Gateway client to send data to Lambda
+            apigClient.formsubmissionPost(params, body, additionalParams)
+                .then(function(result){
+                    console.log("success!");
+                    document.getElementById("messageFailure").style.display="none";
+                    document.getElementById("messageSuccess").style.display="block";
+                    document.getElementById("form-S").style.display="none";
+                    document.getElementById("messageSuccess").innerHTML = confirmationMessage();
+                }).catch( function(result){
+                    console.log("failure");  
+                    document.getElementById("messageFailure").style.display="block";
+                    document.getElementById("messageSuccess").style.display="none";
+                    document.getElementById("form-S").style.display="block";
+                });                          
+        }
+                 
     </script>
 
 </head>
-<body onload="retrieveAuthCode()">
+<body>
     <div>
         <h1 id="error"></h1>
         <h1 id="success"></h1>
     </div>
+    <div id='redirect'>
+        Redirecting...
+        If this does not refresh in 5 seconds, please click <a href="https://roll-call.auth.eu-west-1.amazoncognito.com/login?response_type=code&client_id=4fnqnatdk1i2gbojiair5gcks1&redirect_uri=https://s3-eu-west-1.amazonaws.com/dev-rollcall/webform.html">here</a>
+    </div>
     <!-- Main Container contents -->
-    <h1 id='rc-header' align="center">Roll Call App</h1>
+    <h1 id='rc-header' style="display: none" align="center">Roll Call App</h1>
 
     <!-- Start of form -->
     <div id="messageSuccess" style="display:none;" align="center">
 
     </div>
     <div id="messageFailure" style="display:none;">Something is going wrong :(</div>
-    <div id='form-S' class="container">
+    <div id='form-S' style="display:none" class="container">
         <div class="form-element">
-            <label for="userAlias" class="label-design">User:</label>
-            <input type="text" class="form-design" placeholder="User Alias" name="User" id="alias" required="required">
+            <label for="userAlias" value="" class="label-design">User:</label>
+            <input type="text" class="form-design" value="" name=User" id="alias" disabled="">
+        </div>
+        <div class="form-element">
+            <label for="sel1" class="label-design">PS Profile:</label>
+            <select class="form-design" name="ps-profile" required="required" id="PS-Profile">
+                <option value="" disabled selected id="dis">Select your option</option>
+                <option>DMS</option>
+            </select>
         </div>
         <div class="form-element">
             <label for="sel1" class="label-design">Request Type:</label>
             <select class="form-design" name="Request-Type" required="required" id="Request-Type">
                 <option value="" disabled selected id="dis">Select your option</option>
-                <option>On Vacation</option>
+                <option>Holiday</option>
                 <option>Sick</option>
-                <option>In Training</option>
+                <option>Training Day</option>
+                <option>AWS Events</option>
+                <option>Other - Specify Below</option>
             </select>
         </div>
         <div class="form-element">
