@@ -4,8 +4,10 @@ console.log(event);
 var AWS = require('aws-sdk');
 AWS.config.update({region: 'eu-west-1'});
 var pinpointemail = new AWS.PinpointEmail({apiVersion: '2018-07-26'});
+const rosterOwner = "burnz@amazon.com"
 
 function requestLeave(alias, psprofile, RequestType, MyShift, StartDate, Duration, RequestReason){ 
+    psprofile = "test"
     var confirmationEmail = {
         Content: {
             Simple: {
@@ -26,7 +28,7 @@ function requestLeave(alias, psprofile, RequestType, MyShift, StartDate, Duratio
         Destination: {
             CcAddresses: [alias + "@amazon.com"],
             ToAddresses: 
-                [alias + "@amazon.com"] //will be set as aws-ps-dms-dub-vacation in prod, sent to burnz@amazon.com in dev/beta
+                [rosterOwner] //will be set as aws-ps-dms-dub-vacation in prod, sent to burnz@amazon.com in dev/beta
         },
         FromEmailAddress: "aws-ps-rollcall@amazon.com"
     };
@@ -44,7 +46,8 @@ for(var key in event){
     var shift = event["shift"]
     var sDate = event["startdate"]
     var dur = event["Duration"]
-    var rReason = event["RequestReason"]   
+    var rReason = event["RequestReason"]
+    var site = event["Site"]   
 }
 
 var unEscRReason = unescape(rReason);

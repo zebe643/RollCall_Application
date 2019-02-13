@@ -67,81 +67,66 @@
 
     <script type="text/javascript">
 
-        const client_id = "4fnqnatdk1i2gbojiair5gcks1"; //client ID of Cognito App Client
+        const client_id = "nfm3pqn7899pnc4mkomangdeb"; //client ID of Cognito App Client
         console.log("starting auth");
-        var authCode; //this is the code that you use to exchange it for tokens.
-        var userTokens; //This var contains all the tokens of the user (id,access,refresh) tokens.
 
-        //
-        window.onload = function() {
-            //Check to see if JWT is in storage
-            if(sessionStorage.getItem('token') == null){
-                //if no token, get the token from the URL
-                retrieveAuthCode();
+    window.onload = function() {
+        checkIfTokenExists();
+     
+    }
+
+    function checkIfTokenExists(){
+        //Check to see if JWT is in storage
+        if(sessionStorage.getItem('token') == null){
+            console.log("tokens dont exist");
+            if(window.location.href.indexOf("token=") > -1){
+                decodeIdtoken();
+                console.log("now retrieved tokens")
             }else{
-                //if there is token, use token as auth
-                console.log("tokens are here!");
-                console.log(getTokens())
-                document.getElementById("form-S").style.display = "block";
-                document.getElementById("rc-header").style.display = "block";
-                document.getElementById ("redirect").style.display = "none"
+                console.log("no token to be found, redirecting back tio login");
+                window.location.href = "signin.html";
             }
-        }  
+        }else{
+            console.log("tokens are here!");
+            getUserAttributes();
+    } 
+}
+    
+    function decodeIdtoken() {
+        //grabbing full jwt from url
+        let code = window.location.search;
+        //splitting url into 2 parts, [0] being url, [1] jwt
+        let codeNum = code.split("=");
+        let fullJWT = codeNum[1];
+        let splitJWTtoID = fullJWT.split('.')[3];
+        let splitJWTtoAccess = fullJWT.split('.')[1];
+        let splitJWTtoRefresh = fullJWT.split('.')[0];
+        let base64 = splitJWTtoID.replace('-', '+').replace('_', '/');
+        var tokenResult = JSON.parse(window.atob(base64));
+        console.log(tokenResult);
+        console.log(splitJWTtoID);
+        sessionStorage.setItem('token', JSON.stringify(splitJWTtoID));
+        //location.reload();
+        return [splitJWTtoID, tokenResult];
 
-         //Function to get the code from the addressbar to retrieve tokens from Cognito
-        function retrieveAuthCode() {
-            var code = window.location.search;
-            var codeNum = code.split("=");
-            authCode = codeNum[1];
-            console.log(authCode);
+    }   
+      
 
-            retrieveUserTokens();
-        }        
+    function getUserAttributes(){
+        let fullToken = decodeIdtoken();
+        var tokenResult = fullToken[1];
+        var username = tokenResult['cognito:username'];
+        var profile = tokenResult["profile"];
+        var site = tokenResult["custom:site"];
+        console.log(username);
+        console.log(profile);
+        console.log(site);
+        document.getElementById("alias").value = username;
+        document.getElementById("PS-Profile").value = profile;
+        document.getElementById("site").value = site;
 
-        //Function to retrieve user tokens using the Token Endpoint
-        function retrieveUserTokens() {
-            $.ajax({
-                    type: "POST",
-                    url: "https://roll-call.auth.eu-west-1.amazoncognito.com/oauth2/token",
-                    headers: {
-                        "Content-type": "application/x-www-form-urlencoded"
-                    },
-                    data: {
-                        "grant_type": "authorization_code",
-                        "code": authCode,
-                        "client_id": client_id,
-                        "redirect_uri": "https://s3-eu-west-1.amazonaws.com/dev-rollcall/webform.html"
-                    }
-                }).done(function(resultData) {
-                    if (resultData) {
-                        userTokens = resultData;
-                        console.log(resultData)
-                        // save tokens to local storage
-                        sessionStorage.setItem('token', JSON.stringify(resultData));
-                        document.getElementById("form-S").style.display = "block";
-                        document.getElementById("rc-header").style.display = "block";
-                        document.getElementById("redirect").style.display = "none";
-                        document.getElementById("alias").value = getTokens();
 
-                    }
-                })
-                .fail(function(resultData) {
-                        console.log(resultData);
-                        window.location.href = "https://roll-call.auth.eu-west-1.amazoncognito.com/login?response_type=code&client_id=4fnqnatdk1i2gbojiair5gcks1&redirect_uri=https://s3-eu-west-1.amazonaws.com/dev-rollcall/webform.html";
-                    })
-                
-        };
-        //parses id token from JWT and returns token as variable 'username'
-        function getTokens(){
-            var tokens = sessionStorage.getItem('token')
-            var base64Url = tokens.split('.')[1];
-            var base64 = base64Url.replace('-', '+').replace('_', '/');
-            var tokenResult = JSON.parse(window.atob(base64));
-            console.log(tokenResult);
-            var username = tokenResult["cognito:username"];
-            document.getElementById("alias").value = username
-            return username;
-        }
+    }
 
         //validation to see if any fields have been left blank
         function checkIfEmpty() {
@@ -223,7 +208,8 @@
                     shift: document.getElementById("Weekly-Shift").value,
                     startdate: newDateFormat,
                     Duration: document.getElementById("Duration").value,
-                    RequestReason : encText
+                    RequestReason : encText,
+                    Site: document.getElementById("site").value
                 }
 
             }
@@ -244,9 +230,11 @@
         //if form submission is sucessful, display submitted data
         function confirmationMessage(){
 
+            let site = document.getElementById("site").value;
+
             var confmsg = " <div style='text-align: center;'><h2>Confirmation of Request</h2></div>\
                             <div style='text-align: center;'><p style='display:inline'>User: </p>" + document.getElementById("alias").value + "</div>\
-                            <div style='text-align: center;'><p style='display:inline'>PS Profile: </p>" + document.getElementById("PS-Profile").value + "</div>\
+                            <div style='text-align: center;'><p style='display:inline'>PS Profile: </p>" + document.getElementById("PS-Profile").value + " (" + site + ")" + "</div>\
                             <div style='text-align: center;'><p style='display:inline'>Request Type: </p>" + document.getElementById("Request-Type").value + "</div>\
                             <div style='text-align: center;'><p style='display:inline'>Shift: </p> " + document.getElementById("Weekly-Shift").value + "</div>\
                             <div style='text-align: center;'><p style='display:inline'>Start Date: </p>" + dateFormat() + "</div>\
@@ -281,29 +269,26 @@
         <h1 id="error"></h1>
         <h1 id="success"></h1>
     </div>
-    <div id='redirect'>
+    <div id='redirect' style="display: none;">
         Redirecting...
-        If this does not refresh in 5 seconds, please click <a href="https://roll-call.auth.eu-west-1.amazoncognito.com/login?response_type=code&client_id=4fnqnatdk1i2gbojiair5gcks1&redirect_uri=https://s3-eu-west-1.amazonaws.com/dev-rollcall/webform.html">here</a>
+        If this does not refresh in 5 seconds, please click <a href="signin.html">here</a>
     </div>
     <!-- Main Container contents -->
-    <h1 id='rc-header' style="display: none" align="center">Roll Call App</h1>
+    <h1 id='rc-header' style="display: block" align="center">Roll Call App</h1>
 
     <!-- Start of form -->
     <div id="messageSuccess" style="display:none;" align="center">
 
     </div>
     <div id="messageFailure" style="display:none;">Something is going wrong :(</div>
-    <div id='form-S' style="display:none" class="container">
+    <div id='form-S' style="display:block;" class="container">
         <div class="form-element">
             <label for="userAlias" value="" class="label-design">User:</label>
-            <input type="text" class="form-design" value="" name=User" id="alias" disabled="">
+            <input type="text" class="form-design" value="" name="User" id="alias" disabled="">
         </div>
         <div class="form-element">
             <label for="sel1" class="label-design">PS Profile:</label>
-            <select class="form-design" name="ps-profile" required="required" id="PS-Profile">
-                <option value="" disabled selected id="dis">Select your option</option>
-                <option>DMS</option>
-            </select>
+            <input type="text" class="form-design" value="" name="User" id="PS-Profile" disabled="">
         </div>
         <div class="form-element">
             <label for="sel1" class="label-design">Request Type:</label>
@@ -338,6 +323,7 @@
             <textarea rows="10" name="Request-Reason" id="Request-Reason" required="required" style="width: 50%"></textarea>
         </div>
         <div class="form-element">
+            <input type="hidden" id="site" value="" />
         </div>
         <div id="submitButton1">
             <button id="submitButton" onClick="execute(); encStr();">Submit</button>

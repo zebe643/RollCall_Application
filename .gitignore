@@ -1,1 +1,7 @@
 .DS_Store
+apigClient.js
+lib
+node_modules
+js
+package-lock.json
+package.json

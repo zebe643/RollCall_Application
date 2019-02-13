@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+	<!-- Javascript SDKs-->
+	<script src="js/amazon-cognito-auth.min.js"></script>
+	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.16.min.js"></script> 
+	<script src="js/amazon-cognito-identity.min.js"></script>   
+  <script>
+
+  function signInButton() {
+    
+  var authenticationData = {
+        Username : document.getElementById("inputUsername").value,
+        Password : document.getElementById("inputPassword").value,
+    };
+  
+  var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(authenticationData);
+    
+  var poolData = {
+        UserPoolId : "eu-west-1_i0HfJ8ilR", // Your user pool id here
+        ClientId : "nfm3pqn7899pnc4mkomangdeb", // Your client id here
+    };
+  
+    var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+  
+    var userData = {
+        Username : document.getElementById("inputUsername").value,
+        Pool : userPool,
+    };
+  
+    var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+    
+  cognitoUser.authenticateUser(authenticationDetails, {
+        onSuccess: function (result) {
+          console.log(result);
+      var accessToken = result.getAccessToken().getJwtToken();
+      var idToken = result.getIdToken().getJwtToken();
+      var refreshToken = result.getRefreshToken();
+      var fullJWT = accessToken+idToken+refreshToken;
+      //console.log(fullJWT); 
+      window.location.href = "webform.html?token=" + accessToken + "-" + idToken + "-" + refreshToken;
+        },
+        onFailure: function(err) {
+          console.log("in onFailure");
+            alert(err.message || JSON.stringify(err));
+        },
+    });
+  }
+</script>
+  </head>
+  <body>
+      <h1>Please sign in</h1>
+
+      <input type="text" id="inputUsername"  placeholder="username" name="username" required autofocus>
+      <input type="password" id="inputPassword"  placeholder="Password" name="password" required>    
+      <button type="button" onclick="signInButton()">Sign in</button>
+
+</body>
+</html>

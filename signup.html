@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>SignUp</title>
+    <script src="js/amazon-cognito-auth.min.js"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
+    <script src="js/amazon-cognito-identity.min.js"></script>
+    <script type="text/javascript">
+            
+      function registerButton() {
+        
+        username =  document.getElementById("inputUsername").value; 
+        email = document.getElementById("email").value;
+        site = document.getElementById("site").value;
+        profile = document.getElementById("profile").value;
+        if (document.getElementById("inputPassword").value != document.getElementById("confirmationpassword").value) {
+            alert("Passwords Do Not Match!")
+            throw "Passwords Do Not Match!"
+        } else {
+            password =  document.getElementById("inputPassword").value; 
+        }
+        
+        poolData = {
+                UserPoolId : "eu-west-1_i0HfJ8ilR", // Your user pool id here
+                ClientId : "nfm3pqn7899pnc4mkomangdeb" // Your client id here
+            };      
+        var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+
+        var attributeList = [];
+        
+        var dataEmail = {
+            Name : 'email', 
+            Value : email, //get from form field
+        };
+        
+        var dataProfile = {
+            Name : 'profile', 
+            Value : profile, //get from form field
+        };
+        var dataSite = {
+            Name : 'custom:site', 
+            Value : site, //get from form field
+        };
+
+        var attributeEmail = new AmazonCognitoIdentity.CognitoUserAttribute(dataEmail);
+        var attributeProfile = new AmazonCognitoIdentity.CognitoUserAttribute(dataProfile);
+        var attributeSite = new AmazonCognitoIdentity.CognitoUserAttribute(dataSite);
+        
+        
+        attributeList.push(attributeEmail);
+        attributeList.push(attributeProfile);
+        attributeList.push(attributeSite);
+
+        userPool.signUp(username, password, attributeList, null, function(err, result){
+            if (err) {
+                alert(err.message || JSON.stringify(err));
+                return;
+            }
+            cognitoUser = result.user;
+            console.log('user name is ' + cognitoUser.getUsername());
+            console.log(attributeList);
+            //change elements of page
+            document.getElementById("titleheader").innerHTML = "Check your email for a verification link";
+            
+        });
+      }
+    </script>
+</head>
+
+<body>
+    <div id="titleheader"></div>
+    <div id="main" style="margin: 0 auto; padding-top: 20%; width: 100px">
+        <div>
+            <h1>SignUp!</h1>
+        </div>
+        <div id="username" style="margin: auto; display: inline-block;">
+            <input type="text" id="inputUsername" placeholder="username">
+        </div>
+        <div id="email1" style="margin: auto; display: inline-block; padding-top: 25px;">
+            <input type="email" id="email" placeholder="email" name="email">
+        </div>
+        <div id="site1" style="margin: auto; display: inline-block; padding-top: 25px;">
+            <select style="width: 150px" id="site" name="site">
+                <option value="DUB">Dublin</option>
+                <option value="SYD">Sydney</option>
+                <option value="BLR">Bangalore</option>
+                <option value="CPT">Cape Town</option>
+            </select>
+        </div>
+        <div id="profile1" style="margin: auto; display: inline-block; padding-top: 25px;">
+            <select style="width: 150px" id="profile" name="profile">
+                <option value="dms">DMS</option>
+                <option value="dep">Deployment</option>
+                <option value="sec">Security</option>
+                <option value="lin">Linux</option>
+            </select>
+        </div>
+        <div id="passwored" style="margin: auto; display: inline-block; padding-top: 25px">
+            <input type="password" id="inputPassword"  placeholder="Password" name="passwordInputRegister" required>
+        </div>
+        <div id="passwored" style="margin: auto; display: inline-block; padding-top: 25px">
+            <input type="password" class="form-control" id="confirmationpassword" placeholder="Confirm Password" pattern=".*" required></div>
+        <div id="submit" style="margin: auto; display: inline-block; padding-top: 25px">
+            <button onclick="registerButton();" style="width: 150px">Register!</button>
+        </div>
+ 
+
+    </div>
+</body>
+
+</html>
