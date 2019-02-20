@@ -19,6 +19,7 @@
     <script type="text/javascript" src="lib/apiGatewayCore/simpleHttpClient.js"></script>
     <script type="text/javascript" src="lib/apiGatewayCore/utils.js"></script>
     <script type="text/javascript" src="apigClient.js"></script>
+    <link rel="shortcut icon" href="favicon.ico" type="image/vnd.microsoft.icon">
     <!--- Beginning of Stylesheet -->
     <style type="text/css">
         body {
@@ -72,23 +73,35 @@
 
     window.onload = function() {
         checkIfTokenExists();
-     
     }
 
     function checkIfTokenExists(){
         //Check to see if JWT is in storage
-        if(sessionStorage.getItem('token') == null){
+        if(sessionStorage.getItem('token') == false){
             console.log("tokens dont exist");
             if(window.location.href.indexOf("token=") > -1){
                 decodeIdtoken();
                 console.log("now retrieved tokens")
             }else{
-                console.log("no token to be found, redirecting back tio login");
+                console.log("no token to be found, redirecting back to login");
                 window.location.href = "signin.html";
             }
         }else{
             console.log("tokens are here!");
-            getUserAttributes();
+            //getUserAttributes();
+            let fullToken = decodeIdtoken();
+            var tokenResult = fullToken[1];
+            var username = tokenResult['cognito:username'];
+            var profile = tokenResult["profile"];
+            var site = tokenResult["custom:site"];
+            var dshift = tokenResult["custom:DayShift"];
+            var wshift = tokenResult["custom:WeekShift"]
+
+            document.getElementById("alias").value = username;
+            document.getElementById("PS-Profile").value = profile;
+            document.getElementById("site").value = site;
+            document.getElementById("w-shift").value = wshift;
+            document.getElementById("d-shift").value = dshift;
     } 
 }
     
@@ -108,23 +121,23 @@
         sessionStorage.setItem('token', JSON.stringify(splitJWTtoID));
         //location.reload();
         return [splitJWTtoID, tokenResult];
-
     }   
       
-
+    //takes the decoded ID toke, and parses it to extract user attribute values 
     function getUserAttributes(){
         let fullToken = decodeIdtoken();
         var tokenResult = fullToken[1];
         var username = tokenResult['cognito:username'];
         var profile = tokenResult["profile"];
         var site = tokenResult["custom:site"];
-        console.log(username);
-        console.log(profile);
-        console.log(site);
+        var dshift = tokenResult["custom:DayShift"];
+        var wshift = tokenResult["custom:WeekShift"]
+
         document.getElementById("alias").value = username;
         document.getElementById("PS-Profile").value = profile;
         document.getElementById("site").value = site;
-
+        document.getElementById("w-shift").value = wshift;
+        document.getElementById("d-shift").value = dshift;
 
     }
 
@@ -136,7 +149,7 @@
                 document.getElementById('PS-Profile').value == "" ||
                 document.getElementById('Request-Reason').value == "" ||
                 document.getElementById('Request-Type').value == "" ||
-                document.getElementById('Weekly-Shift').value == "" ||
+                document.getElementById('w-shift').value == "" ||
                 document.getElementById('startdate').value == "" ||
                 document.getElementById('Duration').value == ""
             ) {
@@ -196,47 +209,43 @@
             var newDate = day + "/" + month + "/" + year;
             return newDate;
         }
+
         //Checks to see if the above validation functions are true, and if so, call apigw client to send form data
         function execute() {
             var newDateFormat = dateFormat();
             var encText = encStr();
-            if (checkIfEmpty() && onlyText() && validDate() && validDuration() == true) {
+            if (checkIfEmpty() && onlyText() && validDate() && validDuration()  == true) {
                 var json = {
                     user: document.getElementById("alias").value,
                     psprofile: document.getElementById("PS-Profile").value,
                     requestType: document.getElementById("Request-Type").value,
-                    shift: document.getElementById("Weekly-Shift").value,
+                    shift: document.getElementById("w-shift").value,
+                    dayShift: document.getElementById("d-shift").value,
                     startdate: newDateFormat,
                     Duration: document.getElementById("Duration").value,
                     RequestReason : encText,
                     Site: document.getElementById("site").value
                 }
-
-            }
-
                 var jsonText = JSON.stringify(json, null, 4);
                 console.log(jsonText)
-        
-                var apigClient = apigClientFactory.newClient();
-
-                var params = {
-
-                };
-                var body = jsonText;
-                var additionalParams = {
-
-                }
+                callAPIGW(jsonText);  
+            }else{
+                console.log("Failed due to validation error");
+            }
+  
+        }
 
         //if form submission is sucessful, display submitted data
         function confirmationMessage(){
 
             let site = document.getElementById("site").value;
+            let dayShift = document.getElementById("d-shift").value;
 
             var confmsg = " <div style='text-align: center;'><h2>Confirmation of Request</h2></div>\
                             <div style='text-align: center;'><p style='display:inline'>User: </p>" + document.getElementById("alias").value + "</div>\
                             <div style='text-align: center;'><p style='display:inline'>PS Profile: </p>" + document.getElementById("PS-Profile").value + " (" + site + ")" + "</div>\
                             <div style='text-align: center;'><p style='display:inline'>Request Type: </p>" + document.getElementById("Request-Type").value + "</div>\
-                            <div style='text-align: center;'><p style='display:inline'>Shift: </p> " + document.getElementById("Weekly-Shift").value + "</div>\
+                            <div style='text-align: center;'><p style='display:inline'>Shift: </p> " + document.getElementById("w-shift").value + " (" + dayShift + ")" + "</div>\
                             <div style='text-align: center;'><p style='display:inline'>Start Date: </p>" + dateFormat() + "</div>\
                             <div style='text-align: center;'><p style='display:inline'>Duration: </p>" + document.getElementById("Duration").value + "</div>\
                             <div style='text-align: center;'><p style='display:inline'>Request Reason: </p>" + document.getElementById("Request-Reason").value + "</div>\
@@ -245,26 +254,47 @@
             return confmsg;
 
         }
-            //call to API Gateway client to send data to Lambda
-            apigClient.formsubmissionPost(params, body, additionalParams)
-                .then(function(result){
+
+        function callAPIGW(newJson) { 
+            var jsonToPass = newJson
+            var apigClient = apigClientFactory.newClient();
+            var params = {
+            };
+            var body = jsonToPass;
+            var additionalParams = {
+            }
+        //call to API Gateway client to send data to Lambda
+            if(apigClient.formsubmissionPost(params, body, additionalParams)){
                     console.log("success!");
                     document.getElementById("messageFailure").style.display="none";
                     document.getElementById("messageSuccess").style.display="block";
                     document.getElementById("form-S").style.display="none";
                     document.getElementById("messageSuccess").innerHTML = confirmationMessage();
-                }).catch( function(result){
+                }else{
                     console.log("failure");  
                     document.getElementById("messageFailure").style.display="block";
                     document.getElementById("messageSuccess").style.display="none";
                     document.getElementById("form-S").style.display="block";
-                });                          
-        }
-                 
+                }
+            }  
+
     </script>
 
 </head>
 <body>
+    <script type="text/javascript">
+    (function() {
+        if (window.localStorage) {
+            if (!localStorage.getItem('firstLoad')) {
+                localStorage['firstLoad'] = true;
+                console.log("inside bottom script")
+                window.location.reload();
+            } else
+                localStorage.removeItem('firstLoad');
+            console.log("inside bottom script, second part")
+        }
+    })();
+</script>
     <div>
         <h1 id="error"></h1>
         <h1 id="success"></h1>
@@ -301,14 +331,9 @@
                 <option>Other - Specify Below</option>
             </select>
         </div>
-        <div class="form-element">
+        <div>
             <label for="sel1" class="label-design">My Shift:</label>
-            <select class="form-design" name="Weekly-Shift" required="required" id="Weekly-Shift">
-                <option value="" disabled selected id="dis">Select your option</option>
-                <option>Sun - Thurs</option>
-                <option>Tues - Sat</option>
-                <option>Mon - Fri </option>
-            </select>
+            <input type="text" class="form-design" value="" name="User" id="w-shift" disabled="" style="width: 150px"><input type="text" class="form-design" value="" name="User" id="d-shift" disabled="" style="width: 150px; padding-left: 15px">
         </div>
         <div class="form-element">
             <label for="StartDate:" class="label-design">Start Date: (MM/DD/YYYY)</label>
@@ -331,8 +356,6 @@
     </div>
     </div>
     </div>
-</body>
+ </body>
+
 </html>
-
-
-

@@ -8,52 +8,66 @@
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
     <script src="js/amazon-cognito-identity.min.js"></script>
     <script type="text/javascript">
-            
-      function registerButton() {
-        
-        username =  document.getElementById("inputUsername").value; 
+    function registerButton() {
+
+        username = document.getElementById("inputUsername").value;
         email = document.getElementById("email").value;
         site = document.getElementById("site").value;
         profile = document.getElementById("profile").value;
+        dshift = document.getElementById("day-shift").value
+        wshift = document.getElementById("week-shift").value
         if (document.getElementById("inputPassword").value != document.getElementById("confirmationpassword").value) {
             alert("Passwords Do Not Match!")
             throw "Passwords Do Not Match!"
         } else {
-            password =  document.getElementById("inputPassword").value; 
+            password = document.getElementById("inputPassword").value;
         }
-        
+
         poolData = {
-                UserPoolId : "eu-west-1_i0HfJ8ilR", // Your user pool id here
-                ClientId : "nfm3pqn7899pnc4mkomangdeb" // Your client id here
-            };      
+            UserPoolId: "eu-west-1_i0HfJ8ilR", // Your user pool id here
+            ClientId: "nfm3pqn7899pnc4mkomangdeb" // Your client id here
+        };
         var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
 
         var attributeList = [];
-        
+
         var dataEmail = {
-            Name : 'email', 
-            Value : email, //get from form field
+            Name: 'email',
+            Value: email, //get from form field
         };
-        
+
         var dataProfile = {
-            Name : 'profile', 
-            Value : profile, //get from form field
+            Name: 'profile',
+            Value: profile, //get from form field
         };
         var dataSite = {
-            Name : 'custom:site', 
-            Value : site, //get from form field
+            Name: 'custom:site',
+            Value: site, //get from form field
+        };
+
+        var dataDayShift = {
+            Name: 'custom:DayShift',
+            Value: dshift, //get from form field
+        };
+
+        var dataWeekShift = {
+            Name: 'custom:WeekShift',
+            Value: wshift, //get from form field
         };
 
         var attributeEmail = new AmazonCognitoIdentity.CognitoUserAttribute(dataEmail);
         var attributeProfile = new AmazonCognitoIdentity.CognitoUserAttribute(dataProfile);
         var attributeSite = new AmazonCognitoIdentity.CognitoUserAttribute(dataSite);
-        
-        
+        var attributeDayShift = new AmazonCognitoIdentity.CognitoUserAttribute(dataDayShift);
+        var attributeWeekShift = new AmazonCognitoIdentity.CognitoUserAttribute(dataWeekShift);
+
         attributeList.push(attributeEmail);
         attributeList.push(attributeProfile);
         attributeList.push(attributeSite);
+        attributeList.push(attributeDayShift);
+        attributeList.push(attributeWeekShift);
 
-        userPool.signUp(username, password, attributeList, null, function(err, result){
+        userPool.signUp(username, password, attributeList, null, function(err, result) {
             if (err) {
                 alert(err.message || JSON.stringify(err));
                 return;
@@ -61,16 +75,35 @@
             cognitoUser = result.user;
             console.log('user name is ' + cognitoUser.getUsername());
             console.log(attributeList);
-            //change elements of page
             document.getElementById("titleheader").innerHTML = "Check your email for a verification link";
-            
+            document.getElementById("main").style.display = "none";
+            document.getElementById("codeInput").style.display = "inline";
         });
-      }
+    }
+
+    function confirmSignup(){
+        var userCode = document.getElementById("confirmCode").value
+        cognitoUser.confirmRegistration(userCode, true, function(err, result) {
+           if (err) {
+               alert(err);
+               return;
+           }
+            alert(result);
+            document.getElementById("codeInput").innerHTML = "<a href='signin.html'>Please click here to sign in to the app!</a>"
+        });
+    }
+
     </script>
 </head>
 
 <body>
     <div id="titleheader"></div>
+    <div id="codeInput" style="display: none">
+        <label>Please enter code:</label>
+        <input type="number" id="confirmCode">
+        <button onclick="confirmSignup();">Confirm Registration!</button>
+        
+    </div>
     <div id="main" style="margin: 0 auto; padding-top: 20%; width: 100px">
         <div>
             <h1>SignUp!</h1>
@@ -97,16 +130,28 @@
                 <option value="lin">Linux</option>
             </select>
         </div>
+        <div id="dayShift" style="margin: auto; display: inline-block; padding-top: 25px;">
+            <select style="width: 150px" id="day-shift" name="dshift">
+                <option value="8-4">8-4</option>
+                <option value="9-5">9-5</option>
+                <option value="10-6">10-6</option>
+            </select>
+        </div>
+        <div id="weekShift" style="margin: auto; display: inline-block; padding-top: 25px;">
+            <select style="width: 150px" id="week-shift" name="wshift">
+                <option value="Mon-Fri">Mon-Fri</option>
+                <option value="Tue-Sat">Tue-Sat</option>
+                <option value="Sun-Tueu">Sun-Tue</option>
+            </select>
+        </div>
         <div id="passwored" style="margin: auto; display: inline-block; padding-top: 25px">
-            <input type="password" id="inputPassword"  placeholder="Password" name="passwordInputRegister" required>
+            <input type="password" id="inputPassword" placeholder="Password" name="passwordInputRegister" required>
         </div>
         <div id="passwored" style="margin: auto; display: inline-block; padding-top: 25px">
             <input type="password" class="form-control" id="confirmationpassword" placeholder="Confirm Password" pattern=".*" required></div>
         <div id="submit" style="margin: auto; display: inline-block; padding-top: 25px">
             <button onclick="registerButton();" style="width: 150px">Register!</button>
         </div>
- 
-
     </div>
 </body>
 

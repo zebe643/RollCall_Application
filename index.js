@@ -7,7 +7,6 @@ var pinpointemail = new AWS.PinpointEmail({apiVersion: '2018-07-26'});
 const rosterOwner = "burnz@amazon.com"
 
 function requestLeave(alias, psprofile, RequestType, MyShift, StartDate, Duration, RequestReason){ 
-    psprofile = "test"
     var confirmationEmail = {
         Content: {
             Simple: {
@@ -26,7 +25,7 @@ function requestLeave(alias, psprofile, RequestType, MyShift, StartDate, Duratio
         }
     },
         Destination: {
-            CcAddresses: [alias + "@amazon.com"],
+            //CcAddresses: [alias + "@amazon.com"],
             ToAddresses: 
                 [rosterOwner] //will be set as aws-ps-dms-dub-vacation in prod, sent to burnz@amazon.com in dev/beta
         },
@@ -47,7 +46,8 @@ for(var key in event){
     var sDate = event["startdate"]
     var dur = event["Duration"]
     var rReason = event["RequestReason"]
-    var site = event["Site"]   
+    var site = event["Site"]
+    var dshift = event["dayShift"]   
 }
 
 var unEscRReason = unescape(rReason);
