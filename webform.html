@@ -68,6 +68,7 @@
 
     <script type="text/javascript">
 
+
         const client_id = "nfm3pqn7899pnc4mkomangdeb"; //client ID of Cognito App Client
         console.log("starting auth");
 
@@ -77,7 +78,8 @@
 
     function checkIfTokenExists(){
         //Check to see if JWT is in storage
-        if(sessionStorage.getItem('token') == false){
+        console.log(sessionStorage.getItem('token'));
+        if(sessionStorage.getItem('token') == false || sessionStorage.getItem('token') == null){
             console.log("tokens dont exist");
             if(window.location.href.indexOf("token=") > -1){
                 decodeIdtoken();
@@ -119,7 +121,6 @@
         console.log(tokenResult);
         console.log(splitJWTtoID);
         sessionStorage.setItem('token', JSON.stringify(splitJWTtoID));
-        //location.reload();
         return [splitJWTtoID, tokenResult];
     }   
       

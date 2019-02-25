@@ -7,7 +7,12 @@
     <script src="js/amazon-cognito-auth.min.js"></script>
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
     <script src="js/amazon-cognito-identity.min.js"></script>
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script type="text/javascript">
+
     function registerButton() {
 
         username = document.getElementById("inputUsername").value;
@@ -69,14 +74,17 @@
 
         userPool.signUp(username, password, attributeList, null, function(err, result) {
             if (err) {
+                console.log("in signup error")
+                console.log(err)
                 alert(err.message || JSON.stringify(err));
                 return;
             }
             cognitoUser = result.user;
+            console.log("in signup success")
             console.log('user name is ' + cognitoUser.getUsername());
             console.log(attributeList);
             document.getElementById("titleheader").innerHTML = "Check your email for a verification link";
-            document.getElementById("main").style.display = "none";
+            document.getElementById("signupdiv").style.display = "none";
             document.getElementById("codeInput").style.display = "inline";
         });
     }
@@ -88,71 +96,79 @@
                alert(err);
                return;
            }
-            alert(result);
+            alert(result); 
             document.getElementById("codeInput").innerHTML = "<a href='signin.html'>Please click here to sign in to the app!</a>"
         });
     }
-
     </script>
 </head>
 
 <body>
+<div class="container" style="padding: 5%">
+    <div class="row">
+        <div class="col-3"></div>
+        <div class="col-6">
     <div id="titleheader"></div>
     <div id="codeInput" style="display: none">
         <label>Please enter code:</label>
         <input type="number" id="confirmCode">
-        <button onclick="confirmSignup();">Confirm Registration!</button>
-        
+        <button class="btn btn-info my-4 btn-block" onclick="confirmSignup();">Confirm Registration!</button>
     </div>
-    <div id="main" style="margin: 0 auto; padding-top: 20%; width: 100px">
-        <div>
-            <h1>SignUp!</h1>
-        </div>
-        <div id="username" style="margin: auto; display: inline-block;">
-            <input type="text" id="inputUsername" placeholder="username">
-        </div>
-        <div id="email1" style="margin: auto; display: inline-block; padding-top: 25px;">
-            <input type="email" id="email" placeholder="email" name="email">
-        </div>
-        <div id="site1" style="margin: auto; display: inline-block; padding-top: 25px;">
-            <select style="width: 150px" id="site" name="site">
-                <option value="DUB">Dublin</option>
-                <option value="SYD">Sydney</option>
-                <option value="BLR">Bangalore</option>
-                <option value="CPT">Cape Town</option>
-            </select>
-        </div>
-        <div id="profile1" style="margin: auto; display: inline-block; padding-top: 25px;">
-            <select style="width: 150px" id="profile" name="profile">
-                <option value="dms">DMS</option>
-                <option value="dep">Deployment</option>
-                <option value="sec">Security</option>
-                <option value="lin">Linux</option>
-            </select>
-        </div>
-        <div id="dayShift" style="margin: auto; display: inline-block; padding-top: 25px;">
-            <select style="width: 150px" id="day-shift" name="dshift">
-                <option value="8-4">8-4</option>
-                <option value="9-5">9-5</option>
-                <option value="10-6">10-6</option>
-            </select>
-        </div>
-        <div id="weekShift" style="margin: auto; display: inline-block; padding-top: 25px;">
-            <select style="width: 150px" id="week-shift" name="wshift">
-                <option value="Mon-Fri">Mon-Fri</option>
-                <option value="Tue-Sat">Tue-Sat</option>
-                <option value="Sun-Tueu">Sun-Tue</option>
-            </select>
-        </div>
-        <div id="passwored" style="margin: auto; display: inline-block; padding-top: 25px">
-            <input type="password" id="inputPassword" placeholder="Password" name="passwordInputRegister" required>
-        </div>
-        <div id="passwored" style="margin: auto; display: inline-block; padding-top: 25px">
-            <input type="password" class="form-control" id="confirmationpassword" placeholder="Confirm Password" pattern=".*" required></div>
-        <div id="submit" style="margin: auto; display: inline-block; padding-top: 25px">
-            <button onclick="registerButton();" style="width: 150px">Register!</button>
-        </div>
     </div>
+    <div class="col-3"></div>
+    </div>
+    <div id="signupdiv">
+
+    <div class="row">
+    <div class="col-3"></div>
+    <div class="col-6">
+    <h1 class="display-4">Sign Up</h1>
+    <hr/>
+    <input type="text" id="inputUsername" class="form-control" placeholder="username">
+    <br>
+    <input type="email" id="email" class="form-control" placeholder="email">
+    <br>
+      <select class="form-control" id="site">
+        <option value="" disabled selected id="dis">Please select your site</option>
+        <option value="DUB">Dublin</option>
+        <option value="SYD">Sydney</option>
+        <option value="BLR">Bangalore</option>
+        <option value="CPT">Cape Town</option>
+      </select>
+      <br>
+      <select class="form-control" id="profile">
+        <option value="" disabled selected id="dis">Please select your profile</option>
+        <option value="dms">DMS</option>
+        <option value="dep">Deployment</option>
+        <option value="sec">Security</option>
+        <option value="lin">Linux</option>      
+            </select>
+      <br>
+      <select class="form-control" id="day-shift">
+        <option value="" disabled selected id="dis">Please select your day-shift</option>
+        <option value="8-4">8-4</option>
+        <option value="9-5">9-5</option>
+        <option value="10-6">10-6</option>
+      </select>
+      <br>
+      <select class="form-control" id="week-shift">
+        <option value="" disabled selected id="dis">Select your weekly-shift</option>
+        <option value="Mon-Fri">Mon-Fri</option>
+        <option value="Tue-Sat">Tue-Sat</option>
+        <option value="Sun-Tue">Sun-Tue</option>
+      </select>
+      <br>
+    <input type="password" id="inputPassword" class="form-control" placeholder="Password" aria-describedby="defaultRegisterFormPasswordHelpBlock">
+    <br>
+    <input type="password" id="confirmationpassword" class="form-control" placeholder="Confirm Password" aria-describedby="defaultRegisterFormPasswordHelpBlock">
+
+    <button class="btn btn-info my-4 btn-block" onclick="registerButton();">Sign up</button>
+</div>
+ <div class="col-3"></div>
+
+</div>
+</div>
+</div>
 </body>
 
 </html>
