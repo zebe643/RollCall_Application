@@ -1,11 +1,17 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta content="initial-scale=1, shrink-to-fit=no, width=device-width" name="viewport">
+
+    <!-- CSS -->
+    <!-- Add Material font (Roboto) and Material icon as needed -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i|Roboto+Mono:300,400,700|Roboto+Slab:300,400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Add Material CSS, replace Bootstrap CSS -->
+    <link href="material/css/material.min.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
     <script type="text/javascript" src="lib/axios/dist/axios.standalone.js"></script>
@@ -20,52 +26,94 @@
     <script type="text/javascript" src="lib/apiGatewayCore/utils.js"></script>
     <script type="text/javascript" src="apigClient.js"></script>
     <link rel="shortcut icon" href="favicon.ico" type="image/vnd.microsoft.icon">
-    <!--- Beginning of Stylesheet -->
-    <style type="text/css">
-        body {
-            font-family: Sans-serif;
+  </head>
+  <body>
+<script type="text/javascript">
+    (function() {
+        if (window.localStorage) {
+            if (!localStorage.getItem('firstLoad')) {
+                localStorage['firstLoad'] = true;
+                console.log("inside bottom script")
+                window.location.reload();
+            } else
+                localStorage.removeItem('firstLoad');
+            console.log("inside bottom script, second part")
         }
-        #rc-header {
-            text-align: center;
-            font-size: 40px;
-            font-family: Sans-serif;
-        }
-        #form-outlook {
-            padding-top: 15px;
-            font-family: Sans-serif;
-        }
-        .form-design {
-            width: 50%;
-            height: 25px;
-        }
-        .form-element {
-            padding: 20px;
-            text-align: center;
-        }
-        .label-design {
-            padding: 10px;
-            display: inline-block;
-            width: 30%;
-        }
-        #form-S {
-            border: 3px solid black;
-            width: 50%;
-            text-align: center;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            background-color: #D3D3D3;
-        }
-        #submitButton1 {
-            padding-bottom: 35px;
-        }
-        #submitButton {
-            height: 40px;
-            width: 50%;
-        }
-    </style>
-    <!-- END OF STYLE SHEET -->
+    })();
+</script>
+    <div class="container" style="padding: 5%">
+        <div class="row">
+            <div class="col-2"></div>
+            <div class="col-8">
+    <h1 class="display-4" style="display: block">RollCall App</h1>
+    <hr>
+        <div>
+        <h1 id="error"></h1>
+        <h1 id="success"></h1>
+    </div>
+    <div class="form-group">
+         <div id="messageSuccess" style="display:none;" align="center"></div>
+         <div id="messageFailure" style="display:none;">Something is going wrong :(</div>
+         <div id='form-S' style="display:block;" class="container">
+  <div class="floating-label textfield-box">
+    <label for="exampleFloatingBox7"></label>
+    <input class="form-control" ivalue="" name="User" id="alias" disabled="" readonly="" style="width: 24%; float: left; margin-right: 1%">
+    <input class="form-control" value="" name="User" id="PS-Profile" disabled="" style="width: 24%; float: left; margin-right: 1%">
+    <input class="form-control" id="w-shift" disabled="" value="" type="text" style="width: 24%; float: right; margin-right: 1%">
+    <input class="form-control" id="d-shift" disabled="" value="" type="text" style="width: 24%; float: right; margin-right: 1%">
 
+  </div>
+  <br><br><br>
+    <div class="floating-label textfield-box">
+    <label for="exampleFloatingBox7"></label>
+    
+  </div>
+  <br>
+  <div class="form-group">
+  <div class="floating-label">
+    <label for="exampleFloatingLabel3">Please select your Request Type</label>
+    <select class="form-control" name="Request-Type" required="required" id="Request-Type">
+      <option label=" "></option>
+        <option>Holiday</option>
+        <option>Sick</option>
+        <option>Training Day</option>
+        <option>AWS Events</option>
+        <option>Other - Specify Below</option>
+    </select>
+  </div>
+</div>
+    <div class="floating-label textfield-box">
+    <label for="exampleFloatingBox7"></label>
+    
+    <label for="exampleFloatingBox8"></label>
+  </div>
+<br>
+    <div class="floating-label textfield-box">
+    <label for="exampleFloatingBox7">Start Date:</label>
+    <input class="form-control" id="startdate" placeholder="Default" type="Date">
+  </div>
+  <br>
+      <div class="floating-label textfield-box">
+    <label for="exampleFloatingBox7">No of days:</label>
+    <input class="form-control" id="Duration" placeholder="" placeholder="Default" type="number">
+  </div>
+  <br>
+  <div class="floating-label textfield-box">
+    <label for="exampleFloatingLabel8">Request Reason</label>
+    <textarea class="form-control" required="required" id="Request-Reason" rows="3"></textarea>
+  </div>
+  <br>
+  <div class="form-element">
+    <input type="hidden" id="site" value="" />
+</div>
+  <button class="btn btn-dark my-1" type="button" style="width: 100%" onClick="execute(); encStr();">Submit</button>
+</div>
+</div>
+</div>
+<div class="col-2"></div>
+</div>
+</div>
+    <!-- Optional JavaScript -->
     <script type="text/javascript">
 
         const client_id = "nfm3pqn7899pnc4mkomangdeb"; //client ID of Cognito App Client
@@ -302,82 +350,12 @@
 
     </script>
 
-</head>
-<body>
-    <script type="text/javascript">
-    (function() {
-        if (window.localStorage) {
-            if (!localStorage.getItem('firstLoad')) {
-                localStorage['firstLoad'] = true;
-                console.log("inside bottom script")
-                window.location.reload();
-            } else
-                localStorage.removeItem('firstLoad');
-            console.log("inside bottom script, second part")
-        }
-    })();
-</script>
-    <div>
-        <h1 id="error"></h1>
-        <h1 id="success"></h1>
-    </div>
-    <div id='redirect' style="display: none;">
-        Redirecting...
-        If this does not refresh in 5 seconds, please click <a href="signin.html">here</a>
-    </div>
-    <!-- Main Container contents -->
-    <h1 id='rc-header' style="display: block" align="center">Roll Call App</h1>
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 
-    <!-- Start of form -->
-    <div id="messageSuccess" style="display:none;" align="center">
-
-    </div>
-    <div id="messageFailure" style="display:none;">Something is going wrong :(</div>
-    <div id='form-S' style="display:block;" class="container">
-        <div class="form-element">
-            <label for="userAlias" value="" class="label-design">User:</label>
-            <input type="text" class="form-design" value="" name="User" id="alias" disabled="">
-        </div>
-        <div class="form-element">
-            <label for="sel1" class="label-design">PS Profile:</label>
-            <input type="text" class="form-design" value="" name="User" id="PS-Profile" disabled="">
-        </div>
-        <div class="form-element">
-            <label for="sel1" class="label-design">Request Type:</label>
-            <select class="form-design" name="Request-Type" required="required" id="Request-Type">
-                <option value="" disabled selected id="dis">Select your option</option>
-                <option>Holiday</option>
-                <option>Sick</option>
-                <option>Training Day</option>
-                <option>AWS Events</option>
-                <option>Other - Specify Below</option>
-            </select>
-        </div>
-        <div>
-            <label for="sel1" class="label-design">My Shift:</label>
-            <input type="text" class="form-design" value="" name="User" id="w-shift" disabled="" style="width: 150px"><input type="text" class="form-design" value="" name="User" id="d-shift" disabled="" style="width: 150px; padding-left: 15px">
-        </div>
-        <div class="form-element">
-            <label for="StartDate:" class="label-design">Start Date: (MM/DD/YYYY)</label>
-            <input id="startdate" type="date" name="Start-Date" data-date-format="DD/MM/YYYY" placeholder="DD-MM-YYYY" class="form-design"></input>
-        </div>
-        <div class="form-element">
-            <label for="No-Days:" class="label-design">Duration:</label>
-            <input type="number" class="form-design" placeholder="Duration" name="No-Days" required="required" id="Duration">
-        </div>
-        <div class="form-element">
-            <label for="RequestReason:" class="label-design">Request Reason:</label>
-            <textarea rows="10" name="Request-Reason" id="Request-Reason" required="required" style="width: 50%"></textarea>
-        </div>
-        <div class="form-element">
-            <input type="hidden" id="site" value="" />
-        </div>
-        <div id="submitButton1">
-            <button id="submitButton" onClick="execute(); encStr();">Submit</button>
-        </div>
-    </div>
-    </div>
-    </div>
- </body>
-
+    <!-- Then Material JavaScript on top of Bootstrap JavaScript -->
+    <script src="material/js/material.min.js"></script>
+  </body>
 </html>

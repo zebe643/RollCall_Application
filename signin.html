@@ -2,16 +2,34 @@
 
 <html lang="en">
   <head>
+<!-- Required meta tags -->
     <meta charset="utf-8">
+    <meta content="initial-scale=1, shrink-to-fit=no, width=device-width" name="viewport">
 
-	<!-- Javascript SDKs-->
-	<script src="js/amazon-cognito-auth.min.js"></script>
-	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.16.min.js"></script> 
-	<script src="js/amazon-cognito-identity.min.js"></script>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <!-- CSS -->
+    <!-- Add Material font (Roboto) and Material icon as needed -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i|Roboto+Mono:300,400,700|Roboto+Slab:300,400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Add Material CSS, replace Bootstrap CSS -->
+    <link href="material/css/material.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
+    <script type="text/javascript" src="lib/axios/dist/axios.standalone.js"></script>
+    <script type="text/javascript" src="lib/CryptoJS/rollups/hmac-sha256.js"></script>
+    <script type="text/javascript" src="lib/CryptoJS/rollups/sha256.js"></script>
+    <script type="text/javascript" src="lib/CryptoJS/components/hmac.js"></script>
+    <script type="text/javascript" src="lib/CryptoJS/components/enc-base64.js"></script>
+    <script type="text/javascript" src="lib/url-template/url-template.js"></script>
+    <script type="text/javascript" src="lib/apiGatewayCore/sigV4Client.js"></script>
+    <script type="text/javascript" src="lib/apiGatewayCore/apiGatewayClient.js"></script>
+    <script type="text/javascript" src="lib/apiGatewayCore/simpleHttpClient.js"></script>
+    <script type="text/javascript" src="lib/apiGatewayCore/utils.js"></script>
+    <script type="text/javascript" src="apigClient.js"></script>
+    <script src="js/amazon-cognito-auth.min.js"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
+    <script src="js/amazon-cognito-identity.min.js"></script>
+    <link rel="shortcut icon" href="favicon.ico" type="image/vnd.microsoft.icon">
   <script>
 
   function signInButton() {
@@ -45,7 +63,7 @@
       var refreshToken = result.getRefreshToken();
       var fullJWT = accessToken+idToken+refreshToken;
       //console.log(fullJWT); 
-      window.location.href = "webform.html?token=" + accessToken + "-" + idToken + "-" + refreshToken;
+      window.location.href = "newui.html?token=" + accessToken + "-" + idToken + "-" + refreshToken;
         },
         onFailure: function(err) {
           console.log("in onFailure");
@@ -62,21 +80,36 @@
     <div class="col-6 my-auto">
     <h1 class="display-4">Sign in</h1>
 <hr/>
-    <input type="text" id="inputUsername" class="form-control mb-4" placeholder="username">
-
-    <input type="password" id="inputPassword" class="form-control mb-4" placeholder="Password">
-    <button onclick="signInButton()" class="btn btn-info btn-block my-4">Sign in</button>
-
+<div class="form-group">
+    <div class="floating-label textfield-box">
+    <label for="exampleFloatingBox7">Username</label>
+    <input type="text" class="form-control" ivalue="" name="User" id="inputUsername">
+  </div>
+  <br>
+      <div class="floating-label textfield-box">
+    <label for="exampleFloatingBox7">Password</label>
+    <input type="password" class="form-control" ivalue="" name="User" id="inputPassword">
+  </div>
+  <br>
+    <button onclick="signInButton()" class="btn btn-dark my-1" style="width: 100%">Sign in</button>
+    <br><br>
     <div class="text-center">
-        <p class="lead">Not a member?
+        <p class="h4">Not a member?
             <a href="signup.html">Register</a>
         </p>
     </div>
   </div>
   <div class="col-3"></div>
   </div>
+</div>
   </div>
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 
+    <!-- Then Material JavaScript on top of Bootstrap JavaScript -->
+    <script src="material/js/material.min.js"></script>
 
 
 </body>
