@@ -25,21 +25,13 @@
     <script type="text/javascript" src="lib/apiGatewayCore/simpleHttpClient.js"></script>
     <script type="text/javascript" src="lib/apiGatewayCore/utils.js"></script>
     <script type="text/javascript" src="apigClient.js"></script>
+    <script src="dist/amazon-cognito-auth.min.js"></script>
+
     <link rel="shortcut icon" href="favicon.ico" type="image/vnd.microsoft.icon">
   </head>
   <body>
 <script type="text/javascript">
-    (function() {
-        if (window.localStorage) {
-            if (!localStorage.getItem('firstLoad')) {
-                localStorage['firstLoad'] = true;
-                console.log("inside bottom script")
-                window.location.reload();
-            } else
-                localStorage.removeItem('firstLoad');
-            console.log("inside bottom script, second part")
-        }
-    })();
+
 </script>
     <div class="container" style="padding: 5%">
         <div class="row">
@@ -116,100 +108,72 @@
     <!-- Optional JavaScript -->
     <script type="text/javascript">
 
-        const client_id = "nfm3pqn7899pnc4mkomangdeb"; //client ID of Cognito App Client
-        console.log("starting auth");
-        console.log(sessionStorage.getItem('token'));
-        if(sessionStorage.getItem('token') == false || sessionStorage.getItem('token') == null){
-            console.log("tokens dont exist");
-            if(window.location.href.indexOf("token=") > -1){
-                decodeIdtoken();
-                console.log("now retrieved tokens")
-            }else{
-                console.log("no token to be found, redirecting back to login");
-                window.location.href = "signin.html";
-            }
+    AWS.config.apiVersions = {
+        cognitoidentityserviceprovider: '2016-04-18',
+    };
+    AWS.config.update({region: 'eu-west-1'});
+
+    var cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
+
+    function onLoad() {
+        let i = 3;
+        if(i = 4){
+            console.log("Attributes dont exist...redirecting to ")
         }else{
-            console.log("tokens are here!");
-            //getUserAttributes();
-            let fullToken = decodeIdtoken();
-            var tokenResult = fullToken[1];
-            var username = tokenResult['cognito:username'];
-            var profile = tokenResult["profile"];
-            var site = tokenResult["custom:site"];
-            var dshift = tokenResult["custom:DayShift"];
-            var wshift = tokenResult["custom:WeekShift"]
-
-            document.getElementById("alias").value = username;
-            document.getElementById("PS-Profile").value = profile;
-            document.getElementById("site").value = site;
-            document.getElementById("w-shift").value = wshift;
-            document.getElementById("d-shift").value = dshift;
-    } 
-
-    window.onload = function(){
-        console.log(sessionStorage.getItem('token'));
-        if(sessionStorage.getItem('token') == false || sessionStorage.getItem('token') == null){
-            console.log("tokens dont exist");
-            if(window.location.href.indexOf("token=") > -1){
-                decodeIdtoken();
-                console.log("now retrieved tokens")
-            }else{
-                console.log("no token to be found, redirecting back to login");
-                window.location.href = "signin.html";
-            }
-        }else{
-            console.log("tokens are here!");
-            //getUserAttributes();
-            let fullToken = decodeIdtoken();
-            var tokenResult = fullToken[1];
-            var username = tokenResult['cognito:username'];
-            var profile = tokenResult["profile"];
-            var site = tokenResult["custom:site"];
-            var dshift = tokenResult["custom:DayShift"];
-            var wshift = tokenResult["custom:WeekShift"]
-
-            document.getElementById("alias").value = username;
-            document.getElementById("PS-Profile").value = profile;
-            document.getElementById("site").value = site;
-            document.getElementById("w-shift").value = wshift;
-            document.getElementById("d-shift").value = dshift;
-    } 
-    }
-   
-    function decodeIdtoken() {
-        //grabbing full jwt from url
-        let code = window.location.search;
-        //splitting url into 2 parts, [0] being url, [1] jwt
-        let codeNum = code.split("=");
-        let fullJWT = codeNum[1];
-        let splitJWTtoID = fullJWT.split('.')[3];
-        let splitJWTtoAccess = fullJWT.split('.')[1];
-        let splitJWTtoRefresh = fullJWT.split('.')[0];
-        let base64 = splitJWTtoID.replace('-', '+').replace('_', '/');
-        var tokenResult = JSON.parse(window.atob(base64));
-        console.log(tokenResult);
-        console.log(splitJWTtoID);
-        sessionStorage.setItem('token', JSON.stringify(splitJWTtoID));
-        return [splitJWTtoID, tokenResult];
-    }   
-      
-    //takes the decoded ID toke, and parses it to extract user attribute values 
-    function getUserAttributes(){
-        let fullToken = decodeIdtoken();
-        var tokenResult = fullToken[1];
-        var username = tokenResult['cognito:username'];
-        var profile = tokenResult["profile"];
-        var site = tokenResult["custom:site"];
-        var dshift = tokenResult["custom:DayShift"];
-        var wshift = tokenResult["custom:WeekShift"]
-
-        document.getElementById("alias").value = username;
-        document.getElementById("PS-Profile").value = profile;
-        document.getElementById("site").value = site;
-        document.getElementById("w-shift").value = wshift;
-        document.getElementById("d-shift").value = dshift;
+            console.log("tokens do exist..stay here!")
+            var auth = initCognitoSDK();
+            var curUrl = window.location.href;
+            auth.parseCognitoWebResponse(curUrl);
+        }
 
     }
+
+    // Initialize a cognito auth object.
+    function initCognitoSDK() {
+        var authData = {
+            ClientId : 'nfm3pqn7899pnc4mkomangdeb', 
+            AppWebDomain : 'rollcall.auth.eu-west-1.amazoncognito.com',  
+            TokenScopesArray : ['openid', 'email', 'phone', 'profile', 'aws.cognito.signin.user.admin'],
+            RedirectUriSignIn : 'http://localhost:8000/newui.html',
+            RedirectUriSignOut : 'http://localhost:8000',
+            IdentityProvider : 'Midway', 
+            UserPoolId : 'eu-west-1_i0HfJ8ilR'
+        };
+        
+        var auth = new AmazonCognitoIdentity.CognitoAuth(authData);
+        auth.userhandler = {
+            onSuccess: function(result) {
+            },
+            onFailure: function(err) {
+                alert("Error!" + err);
+            }
+        };
+        auth.useCodeGrantFlow();
+
+        return auth;
+        
+    }
+
+    var accessTk = initCognitoSDK();
+    //console.log(accessTk)
+    const accessToken = accessTk.signInUserSession['accessToken']['payload'];
+    console.log(accessToken)
+    const idToken = accessTk.signInUserSession['idToken']['payload'];
+    console.log(idToken)
+
+    
+    var email = idToken['email'];
+    var username = email.substring(0, email.lastIndexOf("@"));   
+    var profile = idToken["custom:TeamProfile"];
+    var site = idToken["custom:Site"];
+    var dshift = idToken["custom:DayShift"];
+    var wshift = idToken["custom:WeekShift"]
+
+    document.getElementById("alias").value = username;
+    document.getElementById("PS-Profile").value = profile;
+    document.getElementById("site").value = site;
+    document.getElementById("w-shift").value = wshift;
+    document.getElementById("d-shift").value = dshift;
 
         //validation to see if any fields have been left blank
         function checkIfEmpty() {
@@ -315,12 +279,12 @@
                             <div style='text-align: center;'><p style='display:inline'>User: </p>" + document.getElementById("alias").value + "</div>\
                             <div style='text-align: center;'><p style='display:inline'>PS Profile: </p>" + document.getElementById("PS-Profile").value + " (" + site + ")" + "</div>\
                             <div style='text-align: center;'><p style='display:inline'>Request Type: </p>" + document.getElementById("Request-Type").value + "</div>\
-                            <div style='text-align: center;'><p style='display:inline'>Shift: </p> " + document.getElementById("w-shift").value + " (" + dayShift + ")" + "</div>\
+                                <div style='text-align: center;'><p style='display:inline'>Shift: </p> " + document.getElementById("w-shift").value + " (" + dayShift + ")" + "</div>\
                             <div style='text-align: center;'><p style='display:inline'>Start Date: </p>" + dateFormat() + "</div>\
                             <div style='text-align: center;'><p style='display:inline'>Duration: </p>" + document.getElementById("Duration").value + "</div>\
                             <div style='text-align: center;'><p style='display:inline'>Request Reason: </p>" + document.getElementById("Request-Reason").value + "</div>\
                             <br/><br/>\
-                            <div><button value='SubmitRequest!'onClick='window.location.reload()'>Submit Another Request!</button></div>";
+                            <div><button value='SubmitRequest!'onClick='location.reload(true);'>Submit Another Request!</button></div>";
             return confmsg;
 
         }
@@ -334,7 +298,8 @@
             var additionalParams = {
             }
         //call to API Gateway client to send data to Lambda
-            if(apigClient.formsubmissionPost(params, body, additionalParams)){
+        //debugger;
+            if(apigClient.tos3Post(params, body, additionalParams)){
                     console.log("success!");
                     document.getElementById("messageFailure").style.display="none";
                     document.getElementById("messageSuccess").style.display="block";

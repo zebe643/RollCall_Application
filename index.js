@@ -6,7 +6,8 @@ AWS.config.update({region: 'eu-west-1'});
 var pinpointemail = new AWS.PinpointEmail({apiVersion: '2018-07-26'});
 const rosterOwner = "burnz@amazon.com"
 
-function requestLeave(alias, psprofile, RequestType, MyShift, StartDate, Duration, RequestReason){ 
+function requestLeave(alias, psprofile, RequestType, MyShift, StartDate, Duration, RequestReason){
+
     var confirmationEmail = {
         Content: {
             Simple: {
@@ -49,6 +50,10 @@ for(var key in event){
     var site = event["Site"]
     var dshift = event["dayShift"]   
 }
+
+
+
+
 
 var unEscRReason = unescape(rReason);
 

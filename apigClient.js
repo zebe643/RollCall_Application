@@ -53,7 +53,7 @@ apigClientFactory.newClient = function (config) {
 
     
     // extract endpoint and path from url
-    var invokeUrl = 'https://cq4elwfe23.execute-api.eu-west-1.amazonaws.com/dev';
+    var invokeUrl = 'https://bfgsuhakd7.execute-api.eu-west-1.amazonaws.com/v1';
     var endpoint = /(^https?:\/\/[^\/]+)/g.exec(invokeUrl)[1];
     var pathComponent = invokeUrl.substring(endpoint.length);
 
@@ -83,39 +83,39 @@ apigClientFactory.newClient = function (config) {
     
     
     
-    apigClient.formsubmissionPost = function (params, body, additionalParams) {
+    apigClient.tos3Post = function (params, body, additionalParams) {
         if(additionalParams === undefined) { additionalParams = {}; }
         
         apiGateway.core.utils.assertParametersDefined(params, [], ['body']);
         
-        var formsubmissionPostRequest = {
+        var tos3PostRequest = {
             verb: 'post'.toUpperCase(),
-            path: pathComponent + uritemplate('/formsubmission').expand(apiGateway.core.utils.parseParametersToObject(params, [])),
+            path: pathComponent + uritemplate('/tos3').expand(apiGateway.core.utils.parseParametersToObject(params, [])),
             headers: apiGateway.core.utils.parseParametersToObject(params, []),
             queryParams: apiGateway.core.utils.parseParametersToObject(params, []),
             body: body
         };
         
         
-        return apiGatewayClient.makeRequest(formsubmissionPostRequest, authType, additionalParams, config.apiKey);
+        return apiGatewayClient.makeRequest(tos3PostRequest, authType, additionalParams, config.apiKey);
     };
     
     
-    apigClient.formsubmissionOptions = function (params, body, additionalParams) {
+    apigClient.tos3Options = function (params, body, additionalParams) {
         if(additionalParams === undefined) { additionalParams = {}; }
         
         apiGateway.core.utils.assertParametersDefined(params, [], ['body']);
         
-        var formsubmissionOptionsRequest = {
+        var tos3OptionsRequest = {
             verb: 'options'.toUpperCase(),
-            path: pathComponent + uritemplate('/formsubmission').expand(apiGateway.core.utils.parseParametersToObject(params, [])),
+            path: pathComponent + uritemplate('/tos3').expand(apiGateway.core.utils.parseParametersToObject(params, [])),
             headers: apiGateway.core.utils.parseParametersToObject(params, []),
             queryParams: apiGateway.core.utils.parseParametersToObject(params, []),
             body: body
         };
         
         
-        return apiGatewayClient.makeRequest(formsubmissionOptionsRequest, authType, additionalParams, config.apiKey);
+        return apiGatewayClient.makeRequest(tos3OptionsRequest, authType, additionalParams, config.apiKey);
     };
     
 
