@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta content="initial-scale=1, shrink-to-fit=no, width=device-width" name="viewport">
+
+    <!-- CSS -->
+    <!-- Add Material font (Roboto) and Material icon as needed -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i|Roboto+Mono:300,400,700|Roboto+Slab:300,400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Add Material CSS, replace Bootstrap CSS -->
+    <link href="material/css/material.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
+    <script type="text/javascript" src="lib/axios/dist/axios.standalone.js"></script>
+    <script type="text/javascript" src="lib/CryptoJS/rollups/hmac-sha256.js"></script>
+    <script type="text/javascript" src="lib/CryptoJS/rollups/sha256.js"></script>
+    <script type="text/javascript" src="lib/CryptoJS/components/hmac.js"></script>
+    <script type="text/javascript" src="lib/CryptoJS/components/enc-base64.js"></script>
+    <script type="text/javascript" src="lib/url-template/url-template.js"></script>
+    <script type="text/javascript" src="lib/apiGatewayCore/sigV4Client.js"></script>
+    <script type="text/javascript" src="lib/apiGatewayCore/apiGatewayClient.js"></script>
+    <script type="text/javascript" src="lib/apiGatewayCore/simpleHttpClient.js"></script>
+    <script type="text/javascript" src="lib/apiGatewayCore/utils.js"></script>
+    <script type="text/javascript" src="apigClient.js"></script>
+    <script src="js/amazon-cognito-auth.min.js"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
+    <script src="js/amazon-cognito-identity.min.js"></script>
+    <script src="dist/amazon-cognito-auth.min.js"></script>
+    <link rel="shortcut icon" href="favicon.ico" type="image/vnd.microsoft.icon">
+
+</head>
+
+<body onload="onLoad()">
+<div class="container" style="padding: 5%">
+    <div class="row">
+        <div class="col-3"></div>
+        <div class="col-6">
+    <div id="titleheader"></div>
+    <div id="codeInput" style="display: none">
+        <label>Please enter code:</label>
+        <input type="number" id="confirmCode">
+        <br>
+        <br>
+        <button class="btn btn-secondary" style="width: 100%" onclick="confirmSignup(); newui();">Confirm Registration!</button>
+    </div>
+    </div>
+    <div class="col-3"></div>
+    </div>
+    <div id="signupdiv">
+
+    <div class="row">
+    <div class="col-3"></div>
+    <div class="col-6">
+    <h1 class="display-4">Sign Up</h1>
+    <hr/>
+    <div class="form-group">
+    <br>
+     <div class="floating-label">
+    <label for="exampleFloatingLabel3">Please select your site</label>
+    <select class="form-control" name="Request-Type" required="required" id="site">
+        <option value="" disabled selected id="dis">Please select your site</option>
+        <option value="DUB">Dublin</option>
+    </select>
+  </div>
+      <br>
+    <div class="floating-label">
+    <label for="exampleFloatingLabel3">Please select your profile</label>
+    <select class="form-control" name="Request-Type" required="required" id="profile">
+        <option value="" disabled selected id="dis">Please select your profile</option>
+        <option value="dms">DMS</option>
+        <option value="dep">Deployment</option>
+    </select>
+  </div>
+  <br>
+      <div class="floating-label">
+    <label for="exampleFloatingLabel3">Please select your day-shift</label>
+    <select class="form-control" name="Request-Type" required="required" id="day-shift">
+        <option value="" disabled selected id="dis">Please select your day shift</option>
+        <option value="8-4">8-4</option>
+        <option value="9-5">9-5</option>
+        <option value="10-6">10-6</option>
+    </select>
+  </div>
+  <br>
+        <div class="floating-label">
+    <label for="exampleFloatingLabel3">Please select your weekly shift</label>
+    <select class="form-control" name="Request-Type" required="required" id="week-shift">
+        <option value="" disabled selected id="dis">Please select your weekly shift</option>
+        <option value="Mon-Fri">Mon-Fri</option>
+        <option value="Tue-Sat">Tue-Sat</option>
+        <option value="Sun-Tue">Sun-Tue</option>
+    </select>
+  </div>
+  <br>
+    <button id="submitButton" class="btn btn-dark my-1" onclick="addAttributes();" style="width: 100%">Sign up</button>
+</div>
+</div>
+ <div class="col-3"></div>
+
+</div>
+</div>
+</div>
+    <script type="text/javascript">
+    AWS.config.apiVersions = {
+      cognitoidentityserviceprovider: '2016-04-18',
+    };
+    AWS.config.update({region: 'eu-west-1'});
+
+    var cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
+
+    function onLoad() {
+        var auth = initCognitoSDK();
+        var curUrl = window.location.href;
+        auth.parseCognitoWebResponse(curUrl);
+    }
+
+    // Initialize a cognito auth object.
+    function initCognitoSDK() {
+        var authData = {
+            ClientId : 'nfm3pqn7899pnc4mkomangdeb', 
+            AppWebDomain : 'rollcall.auth.eu-west-1.amazoncognito.com',  
+            TokenScopesArray : ['openid', 'email', 'phone', 'profile', 'aws.cognito.signin.user.admin'],
+            RedirectUriSignIn : 'http://localhost:8000/addAttributes.html',
+            RedirectUriSignOut : 'http://localhost:8000',
+            IdentityProvider : 'Midway', 
+            UserPoolId : 'eu-west-1_i0HfJ8ilR'
+        };
+        
+        var auth = new AmazonCognitoIdentity.CognitoAuth(authData);
+        auth.userhandler = {
+            onSuccess: function(result) {
+            },
+            onFailure: function(err) {
+                alert("Error!" + err);
+            }
+        };
+        auth.useCodeGrantFlow();
+
+        return auth;
+        
+    }
+
+    var accessTk = initCognitoSDK();
+    const accessToken = accessTk.signInUserSession['accessToken']['jwtToken'];
+    console.log(accessToken)
+
+        function addAttributes() {
+
+            site = document.getElementById("site").value;
+            profile = document.getElementById("profile").value;
+            dshift = document.getElementById("day-shift").value;
+            wshift = document.getElementById("week-shift").value;
+
+            var params = {
+              AccessToken: accessToken,
+              UserAttributes: [
+                {
+                  Name: 'custom:Site', 
+                  Value: site
+                },
+                        {
+                  Name: 'custom:DayShift', 
+                  Value: dshift
+                },
+                        {
+                  Name: 'custom:WeekShift', 
+                  Value: wshift
+                },
+                        {
+                  Name: 'custom:TeamProfile', 
+                  Value: profile
+                }        
+              ]
+            };
+            
+            cognitoidentityserviceprovider.updateUserAttributes(params, function(err, data) {
+              if(err){
+                console.log(err, err.stack); // an error occurred
+              } 
+              else{
+                console.log(data); // successful response
+                console.log("sucessfully updated attributes!")
+                window.location.href="newui.html"
+              }     
+            });
+
+        }
+
+        function redirect(){
+            document.getElementById("submitButton").onclick = function () {
+                console.log("redirecting...")
+            window.location.replace = "newui.html";
+            };       
+        }
+
+    </script>
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+
+    <!-- Then Material JavaScript on top of Bootstrap JavaScript -->
+    <script src="material/js/material.min.js"></script>
+</body>
+
+</html>
