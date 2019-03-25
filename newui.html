@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta content="initial-scale=1, shrink-to-fit=no, width=device-width" name="viewport">
-
     <!-- CSS -->
     <!-- Add Material font (Roboto) and Material icon as needed -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i|Roboto+Mono:300,400,700|Roboto+Slab:300,400,700" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
     <!-- Add Material CSS, replace Bootstrap CSS -->
     <link href="material/css/material.min.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
@@ -25,257 +24,260 @@
     <script type="text/javascript" src="lib/apiGatewayCore/simpleHttpClient.js"></script>
     <script type="text/javascript" src="lib/apiGatewayCore/utils.js"></script>
     <script type="text/javascript" src="apigClient.js"></script>
+    <script src="js/amazon-cognito-identity.min.js"></script>
     <script src="dist/amazon-cognito-auth.min.js"></script>
-
     <link rel="shortcut icon" href="favicon.ico" type="image/vnd.microsoft.icon">
-  </head>
-  <body>
-<script type="text/javascript">
-
-</script>
+</head>
+<body onload="onLoad(firstLoginState, auth)">
     <div class="container" style="padding: 5%">
         <div class="row">
             <div class="col-2"></div>
             <div class="col-8">
-    <h1 class="display-4" style="display: block">RollCall App</h1>
-    <hr>
-        <div>
-        <h1 id="error"></h1>
-        <h1 id="success"></h1>
+                <h1 class="display-4" style="display: block">RollCall App</h1>
+                <hr>
+                <div>
+                    <h1 id="error"></h1>
+                    <h1 id="success"></h1>
+                </div>
+                <div class="form-group">
+                    <div id="messageSuccess" style="display:none;" align="center"></div>
+                    <div id="messageFailure" style="display:none;">Something is going wrong :(</div>
+                    <div id='form-S' style="display:block;" class="container">
+                        <div class="floating-label textfield-box">
+                            <label for="exampleFloatingBox7"></label>
+                            <input class="form-control" ivalue="" name="User" id="alias" disabled="" readonly="" style="width: 24%; float: left; margin-right: 1%">
+                            <input class="form-control" value="" name="User" id="PS-Profile" disabled="" style="width: 24%; float: left; margin-right: 1%">
+                            <input class="form-control" id="w-shift" disabled="" value="" type="text" style="width: 24%; float: right; margin-right: 1%">
+                            <input class="form-control" id="d-shift" disabled="" value="" type="text" style="width: 24%; float: right; margin-right: 1%">
+                        </div>
+                        <br><br><br>
+                        <div class="floating-label textfield-box">
+                            <label for="exampleFloatingBox7"></label>
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            <div class="floating-label">
+                                <label for="exampleFloatingLabel3">Please select your Request Type</label>
+                                <select class="form-control" name="Request-Type" required="required" id="Request-Type">
+                                    <option label=" "></option>
+                                    <option>Holiday</option>
+                                    <option>Sick</option>
+                                    <option>Training Day</option>
+                                    <option>AWS Events</option>
+                                    <option>Other - Specify Below</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="floating-label textfield-box">
+                            <label for="exampleFloatingBox7"></label>
+                            <label for="exampleFloatingBox8"></label>
+                        </div>
+                        <br>
+                        <div class="floating-label textfield-box">
+                            <label for="exampleFloatingBox7">Start Date:</label>
+                            <input class="form-control" id="startdate" placeholder="Default" type="Date">
+                        </div>
+                        <br>
+                        <div class="floating-label textfield-box">
+                            <label for="exampleFloatingBox7">No of days:</label>
+                            <input class="form-control" id="Duration" placeholder="" placeholder="Default" type="number">
+                        </div>
+                        <br>
+                        <div class="floating-label textfield-box">
+                            <label for="exampleFloatingLabel8">Request Reason</label>
+                            <textarea class="form-control" required="required" id="Request-Reason" rows="3"></textarea>
+                        </div>
+                        <br>
+                        <div class="form-element">
+                            <input type="hidden" id="site" value="" />
+                        </div>
+                        <button class="btn btn-dark my-1" type="button" style="width: 100%" onClick="execute(); encStr();">Submit</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-2"></div>
+        </div>
     </div>
-    <div class="form-group">
-         <div id="messageSuccess" style="display:none;" align="center"></div>
-         <div id="messageFailure" style="display:none;">Something is going wrong :(</div>
-         <div id='form-S' style="display:block;" class="container">
-  <div class="floating-label textfield-box">
-    <label for="exampleFloatingBox7"></label>
-    <input class="form-control" ivalue="" name="User" id="alias" disabled="" readonly="" style="width: 24%; float: left; margin-right: 1%">
-    <input class="form-control" value="" name="User" id="PS-Profile" disabled="" style="width: 24%; float: left; margin-right: 1%">
-    <input class="form-control" id="w-shift" disabled="" value="" type="text" style="width: 24%; float: right; margin-right: 1%">
-    <input class="form-control" id="d-shift" disabled="" value="" type="text" style="width: 24%; float: right; margin-right: 1%">
-
-  </div>
-  <br><br><br>
-    <div class="floating-label textfield-box">
-    <label for="exampleFloatingBox7"></label>
-    
-  </div>
-  <br>
-  <div class="form-group">
-  <div class="floating-label">
-    <label for="exampleFloatingLabel3">Please select your Request Type</label>
-    <select class="form-control" name="Request-Type" required="required" id="Request-Type">
-      <option label=" "></option>
-        <option>Holiday</option>
-        <option>Sick</option>
-        <option>Training Day</option>
-        <option>AWS Events</option>
-        <option>Other - Specify Below</option>
-    </select>
-  </div>
-</div>
-    <div class="floating-label textfield-box">
-    <label for="exampleFloatingBox7"></label>
-    
-    <label for="exampleFloatingBox8"></label>
-  </div>
-<br>
-    <div class="floating-label textfield-box">
-    <label for="exampleFloatingBox7">Start Date:</label>
-    <input class="form-control" id="startdate" placeholder="Default" type="Date">
-  </div>
-  <br>
-      <div class="floating-label textfield-box">
-    <label for="exampleFloatingBox7">No of days:</label>
-    <input class="form-control" id="Duration" placeholder="" placeholder="Default" type="number">
-  </div>
-  <br>
-  <div class="floating-label textfield-box">
-    <label for="exampleFloatingLabel8">Request Reason</label>
-    <textarea class="form-control" required="required" id="Request-Reason" rows="3"></textarea>
-  </div>
-  <br>
-  <div class="form-element">
-    <input type="hidden" id="site" value="" />
-</div>
-  <button class="btn btn-dark my-1" type="button" style="width: 100%" onClick="execute(); encStr();">Submit</button>
-</div>
-</div>
-</div>
-<div class="col-2"></div>
-</div>
-</div>
     <!-- Optional JavaScript -->
     <script type="text/javascript">
-
+    var auth;
+    var firstLoginState;
     AWS.config.apiVersions = {
         cognitoidentityserviceprovider: '2016-04-18',
     };
-    AWS.config.update({region: 'eu-west-1'});
+    AWS.config.update({ region: 'eu-west-1' });
 
-    var cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
+    const cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
 
-    function onLoad() {
-        let i = 3;
-        if(i = 4){
-            console.log("Attributes dont exist...redirecting to ")
-        }else{
-            console.log("tokens do exist..stay here!")
-            var auth = initCognitoSDK();
-            var curUrl = window.location.href;
-            auth.parseCognitoWebResponse(curUrl);
-        }
+    var auth = initCognitoSDK();
+    var sesh = auth.getSession();
+    var curUrl = window.location.href;
+    auth.parseCognitoWebResponse(curUrl);
 
+    async function onLoad(firstLoginState, auth) {
+        xmlhttpRequest(accessjwt);
     }
+
+    function xmlhttpRequest(accessjwt){
+        console.log("making http request...");
+        const Http = new XMLHttpRequest();
+        const url='https://rollcall.auth.eu-west-1.amazoncognito.com/oauth2/userInfo';
+        Http.open("GET", url);
+        Http.setRequestHeader("Authorization", "Bearer " + accessjwt);
+        Http.send();
+        Http.onloadend=(e)=>{
+            var response = JSON.parse(Http.responseText);
+            
+            if (response["custom:firstSignUp"] === "1") {
+                window.location.href = 'addAttributes.html'
+            } else {
+                document.getElementById("PS-Profile").value = response["custom:TeamProfile"];
+                document.getElementById("site").value = response["custom:Site"];
+                document.getElementById("w-shift").value = response["custom:WeekShift"];
+                document.getElementById("d-shift").value = response["custom:DayShift"];
+            }
+        }
+    };
 
     // Initialize a cognito auth object.
     function initCognitoSDK() {
         var authData = {
-            ClientId : 'nfm3pqn7899pnc4mkomangdeb', 
-            AppWebDomain : 'rollcall.auth.eu-west-1.amazoncognito.com',  
-            TokenScopesArray : ['openid', 'email', 'phone', 'profile', 'aws.cognito.signin.user.admin'],
-            RedirectUriSignIn : 'http://localhost:8000/newui.html',
-            RedirectUriSignOut : 'http://localhost:8000',
-            IdentityProvider : 'Midway', 
-            UserPoolId : 'eu-west-1_i0HfJ8ilR'
+            ClientId: 'nfm3pqn7899pnc4mkomangdeb',
+            AppWebDomain: 'rollcall.auth.eu-west-1.amazoncognito.com',
+            TokenScopesArray: ['openid', 'email', 'phone', 'profile', 'aws.cognito.signin.user.admin'],
+            RedirectUriSignIn: 'http://localhost:8000/newui.html',
+            RedirectUriSignOut: 'http://localhost:8000',
+            IdentityProvider: 'Midway',
+            UserPoolId: 'eu-west-1_i0HfJ8ilR'
         };
-        
+
         var auth = new AmazonCognitoIdentity.CognitoAuth(authData);
         auth.userhandler = {
             onSuccess: function(result) {
+                console.log("sucessful auth...")
             },
             onFailure: function(err) {
                 alert("Error!" + err);
             }
-        };
+        }
         auth.useCodeGrantFlow();
-
         return auth;
-        
-    }
+
+    };
 
     var accessTk = initCognitoSDK();
-    //console.log(accessTk)
-    const accessToken = accessTk.signInUserSession['accessToken']['payload'];
-    console.log(accessToken)
-    const idToken = accessTk.signInUserSession['idToken']['payload'];
-    console.log(idToken)
+    var accessjwt = accessTk.signInUserSession['accessToken']['jwtToken'];
+    var accessToken = accessTk.signInUserSession['accessToken']['payload'];
+    var idToken = accessTk.signInUserSession['idToken']['payload'];
 
-    
+
     var email = idToken['email'];
-    var username = email.substring(0, email.lastIndexOf("@"));   
-    var profile = idToken["custom:TeamProfile"];
-    var site = idToken["custom:Site"];
-    var dshift = idToken["custom:DayShift"];
-    var wshift = idToken["custom:WeekShift"]
+    var username = email.substring(0, email.lastIndexOf("@"));
 
     document.getElementById("alias").value = username;
-    document.getElementById("PS-Profile").value = profile;
-    document.getElementById("site").value = site;
-    document.getElementById("w-shift").value = wshift;
-    document.getElementById("d-shift").value = dshift;
 
-        //validation to see if any fields have been left blank
-        function checkIfEmpty() {
-            var letters = /^[A-Za-z]+$/;
-            if (
-                document.getElementById('alias').value == "" ||
-                document.getElementById('PS-Profile').value == "" ||
-                document.getElementById('Request-Reason').value == "" ||
-                document.getElementById('Request-Type').value == "" ||
-                document.getElementById('w-shift').value == "" ||
-                document.getElementById('startdate').value == "" ||
-                document.getElementById('Duration').value == ""
-            ) {
-                alert("Please Fill All Required Fields");
+
+    //validation to see if any fields have been left blank
+    function checkIfEmpty() {
+        var letters = /^[A-Za-z]+$/;
+        if (
+            document.getElementById('alias').value == "" ||
+            document.getElementById('PS-Profile').value == "" ||
+            document.getElementById('Request-Reason').value == "" ||
+            document.getElementById('Request-Type').value == "" ||
+            document.getElementById('w-shift').value == "" ||
+            document.getElementById('startdate').value == "" ||
+            document.getElementById('Duration').value == ""
+        ) {
+            alert("Please Fill All Required Fields");
+            return false;
+        } else {
+            return true;
+        }
+    }
+    //ensures for the Alias field, only text can be added as AWS Alias only contail text
+    function onlyText() {
+        var letters = /^[A-Za-z]+$/;
+        if (document.getElementById('alias').value.match(letters)) {
+            return true;
+        } else {
+            alert("your alias can only contain letters!");
+            return false;
+        }
+    }
+    //encodes the text field request-reason to prevent escape characters breaking the app
+    function encStr() {
+        var userString = document.getElementById("Request-Reason").value;
+        var encodeString = encodeURIComponent(userString);
+        encodeString.replace('\n', '%0A');
+        return encodeString;
+    }
+    //validation to ensure the date entered is reasonable (no more than +1 year or -1 year)
+    function validDate() {
+        var newDateFormat = dateFormat();
+        var d1 = newDateFormat.split("/");
+        if (d1[2] > (new Date().getFullYear() + 1) || d1[2] < (new Date().getFullYear() - 1)) {
+            alert("Please ensure date selected falls within 1 year of the current date");
+            return false;
+        } else {
+            return true;
+        }
+    }
+    //validation to ensure the duration field is a positive number and only accepts a whole or half number
+    function validDuration() {
+        if (document.getElementById("Duration").value % 1 == 0 && document.getElementById("Duration").value >= 0.5) {
+            return true;
+        } else {
+            if (document.getElementById("Duration").value % 1 == 0.5) {
+                return true;
+            } else {
+                alert("Duration can only be a full or half days");
                 return false;
-            } else {
-                return true;
             }
         }
-        //ensures for the Alias field, only text can be added as AWS Alias only contail text
-        function onlyText() {
-            var letters = /^[A-Za-z]+$/;
-            if (document.getElementById('alias').value.match(letters)) {
-                return true;
-            } else {
-                alert("your alias can only contain letters!");
-                return false;
+    }
+    //rearranges the format to dd//mm//yyyy
+    function dateFormat() {
+        var oldDate = new Date(document.getElementById("startdate").value);
+        var month = oldDate.getMonth() + 1;
+        var day = oldDate.getDate();
+        var year = oldDate.getFullYear();
+        var newDate = day + "/" + month + "/" + year;
+        return newDate;
+    }
+
+    //Checks to see if the above validation functions are true, and if so, call apigw client to send form data
+    function execute() {
+        var newDateFormat = dateFormat();
+        var encText = encStr();
+        if (checkIfEmpty() && onlyText() && validDate() && validDuration() == true) {
+            var json = {
+                user: document.getElementById("alias").value,
+                psprofile: document.getElementById("PS-Profile").value,
+                requestType: document.getElementById("Request-Type").value,
+                shift: document.getElementById("w-shift").value,
+                dayShift: document.getElementById("d-shift").value,
+                startdate: newDateFormat,
+                Duration: document.getElementById("Duration").value,
+                RequestReason: encText,
+                Site: document.getElementById("site").value
             }
-        }
-        //encodes the text field request-reason to prevent escape characters breaking the app
-        function encStr(){
-            var userString = document.getElementById("Request-Reason").value;
-            var encodeString = encodeURIComponent(userString);
-            encodeString.replace('\n', '%0A');
-            return encodeString;
-        }
-        //validation to ensure the date entered is reasonable (no more than +1 year or -1 year)
-        function validDate() {
-            var newDateFormat = dateFormat();
-            var d1 = newDateFormat.split("/");
-            if (d1[2] > (new Date().getFullYear() + 1) || d1[2] < (new Date().getFullYear() - 1)) {
-                alert("Please ensure date selected falls within 1 year of the current date");
-                return false;
-            } else {
-                return true;
-            }
-        }
-        //validation to ensure the duration field is a positive number and only accepts a whole or half number
-        function validDuration() {
-            if (document.getElementById("Duration").value % 1 == 0 && document.getElementById("Duration").value >= 0.5) {
-                return true;
-            } else {
-                if (document.getElementById("Duration").value % 1 == 0.5) {
-                    return true;
-                } else {
-                    alert("Duration can only be a full or half days");
-                    return false;
-                }
-            }
-        }
-        //rearranges the format to dd//mm//yyyy
-        function dateFormat() {
-            var oldDate = new Date(document.getElementById("startdate").value);
-            var month = oldDate.getMonth() + 1;
-            var day = oldDate.getDate();
-            var year = oldDate.getFullYear();
-            var newDate = day + "/" + month + "/" + year;
-            return newDate;
+            var jsonText = JSON.stringify(json, null, 4);
+            console.log(jsonText)
+            callAPIGW(jsonText);
+        } else {
+            console.log("Failed due to validation error");
         }
 
-        //Checks to see if the above validation functions are true, and if so, call apigw client to send form data
-        function execute() {
-            var newDateFormat = dateFormat();
-            var encText = encStr();
-            if (checkIfEmpty() && onlyText() && validDate() && validDuration()  == true) {
-                var json = {
-                    user: document.getElementById("alias").value,
-                    psprofile: document.getElementById("PS-Profile").value,
-                    requestType: document.getElementById("Request-Type").value,
-                    shift: document.getElementById("w-shift").value,
-                    dayShift: document.getElementById("d-shift").value,
-                    startdate: newDateFormat,
-                    Duration: document.getElementById("Duration").value,
-                    RequestReason : encText,
-                    Site: document.getElementById("site").value
-                }
-                var jsonText = JSON.stringify(json, null, 4);
-                console.log(jsonText)
-                callAPIGW(jsonText);  
-            }else{
-                console.log("Failed due to validation error");
-            }
-  
-        }
+    }
 
-        //if form submission is sucessful, display submitted data
-        function confirmationMessage(){
+    //if form submission is sucessful, display submitted data
+    function confirmationMessage() {
 
-            let site = document.getElementById("site").value;
-            let dayShift = document.getElementById("d-shift").value;
+        let site = document.getElementById("site").value;
+        let dayShift = document.getElementById("d-shift").value;
 
-            var confmsg = " <div style='text-align: center;'><h2>Confirmation of Request</h2></div>\
+        var confmsg = " <div style='text-align: center;'><h2>Confirmation of Request</h2></div>\
                             <div style='text-align: center;'><p style='display:inline'>User: </p>" + document.getElementById("alias").value + "</div>\
                             <div style='text-align: center;'><p style='display:inline'>PS Profile: </p>" + document.getElementById("PS-Profile").value + " (" + site + ")" + "</div>\
                             <div style='text-align: center;'><p style='display:inline'>Request Type: </p>" + document.getElementById("Request-Type").value + "</div>\
@@ -285,42 +287,40 @@
                             <div style='text-align: center;'><p style='display:inline'>Request Reason: </p>" + document.getElementById("Request-Reason").value + "</div>\
                             <br/><br/>\
                             <div><button value='SubmitRequest!'onClick='location.reload(true);'>Submit Another Request!</button></div>";
-            return confmsg;
+        return confmsg;
 
-        }
+    }
 
-        function callAPIGW(newJson) { 
-            var jsonToPass = newJson
-            var apigClient = apigClientFactory.newClient();
-            var params = {
-            };
-            var body = jsonToPass;
-            var additionalParams = {
-            }
+    function callAPIGW(newJson) {
+        var jsonToPass = newJson
+        var apigClient = apigClientFactory.newClient();
+        var params = {};
+        var body = jsonToPass;
+        var additionalParams = {}
         //call to API Gateway client to send data to Lambda
-        //debugger;
-            if(apigClient.tos3Post(params, body, additionalParams)){
-                    console.log("success!");
-                    document.getElementById("messageFailure").style.display="none";
-                    document.getElementById("messageSuccess").style.display="block";
-                    document.getElementById("form-S").style.display="none";
-                    document.getElementById("messageSuccess").innerHTML = confirmationMessage();
-                }else{
-                    console.log("failure");  
-                    document.getElementById("messageFailure").style.display="block";
-                    document.getElementById("messageSuccess").style.display="none";
-                    document.getElementById("form-S").style.display="block";
-                }
-            }  
+        
+        if (apigClient.tos3Post(params, body, additionalParams)) {
+            console.log("success!");
+            document.getElementById("messageFailure").style.display = "none";
+            document.getElementById("messageSuccess").style.display = "block";
+            document.getElementById("form-S").style.display = "none";
+            document.getElementById("messageSuccess").innerHTML = confirmationMessage();
+        } else {
+            console.log("failure");
+            document.getElementById("messageFailure").style.display = "block";
+            document.getElementById("messageSuccess").style.display = "none";
+            document.getElementById("form-S").style.display = "block";
+        }
+    }
+
 
     </script>
-
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-
     <!-- Then Material JavaScript on top of Bootstrap JavaScript -->
     <script src="material/js/material.min.js"></script>
-  </body>
+</body>
+
 </html>

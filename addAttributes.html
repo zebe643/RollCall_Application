@@ -45,7 +45,7 @@
         <input type="number" id="confirmCode">
         <br>
         <br>
-        <button class="btn btn-secondary" style="width: 100%" onclick="confirmSignup(); newui();">Confirm Registration!</button>
+        <button class="btn btn-secondary" style="width: 100%" onclick="confirmSignup();">Confirm Registration!</button>
     </div>
     </div>
     <div class="col-3"></div>
@@ -111,11 +111,15 @@
     AWS.config.update({region: 'eu-west-1'});
 
     var cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
+    var accessTk = initCognitoSDK();
+    var accessToken = accessTk.signInUserSession['accessToken']['jwtToken'];
+    //console.log(accessToken)
 
     function onLoad() {
         var auth = initCognitoSDK();
         var curUrl = window.location.href;
         auth.parseCognitoWebResponse(curUrl);
+        //console.log(auth)
     }
 
     // Initialize a cognito auth object.
@@ -124,7 +128,7 @@
             ClientId : 'nfm3pqn7899pnc4mkomangdeb', 
             AppWebDomain : 'rollcall.auth.eu-west-1.amazoncognito.com',  
             TokenScopesArray : ['openid', 'email', 'phone', 'profile', 'aws.cognito.signin.user.admin'],
-            RedirectUriSignIn : 'http://localhost:8000/addAttributes.html',
+            RedirectUriSignIn : 'http://localhost:8000/newui.html',
             RedirectUriSignOut : 'http://localhost:8000',
             IdentityProvider : 'Midway', 
             UserPoolId : 'eu-west-1_i0HfJ8ilR'
@@ -139,14 +143,8 @@
             }
         };
         auth.useCodeGrantFlow();
-
         return auth;
-        
     }
-
-    var accessTk = initCognitoSDK();
-    const accessToken = accessTk.signInUserSession['accessToken']['jwtToken'];
-    console.log(accessToken)
 
         function addAttributes() {
 
@@ -173,27 +171,30 @@
                         {
                   Name: 'custom:TeamProfile', 
                   Value: profile
-                }        
+                },
+                        {
+                  Name: 'custom:firstSignUp',
+                  Value: '0'
+                }
               ]
             };
             
             cognitoidentityserviceprovider.updateUserAttributes(params, function(err, data) {
               if(err){
-                console.log(err, err.stack); // an error occurred
+                console.log(err); // an error occurred
               } 
               else{
-                console.log(data); // successful response
+                //console.log(data); // successful response
                 console.log("sucessfully updated attributes!")
                 window.location.href="newui.html"
               }     
             });
-
         }
 
         function redirect(){
             document.getElementById("submitButton").onclick = function () {
                 console.log("redirecting...")
-            window.location.replace = "newui.html";
+                window.location.replace = "newui.html";
             };       
         }
 
