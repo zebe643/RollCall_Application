@@ -145,8 +145,8 @@
             ClientId: 'nfm3pqn7899pnc4mkomangdeb',
             AppWebDomain: 'rollcall.auth.eu-west-1.amazoncognito.com',
             TokenScopesArray: ['openid', 'email', 'phone', 'profile', 'aws.cognito.signin.user.admin'],
-            RedirectUriSignIn: 'http://localhost:8000/newui.html',
-            RedirectUriSignOut: 'http://localhost:8000',
+            RedirectUriSignIn: 'https://dev-rollcall.corp.amazon.com/newui.html',
+            RedirectUriSignOut: 'https://dev-rollcall.corp.amazon.com',
             IdentityProvider: 'Midway',
             UserPoolId: 'eu-west-1_i0HfJ8ilR'
         };
@@ -271,8 +271,11 @@
 
     }
 
+    const url = "https://dev-rollcall.corp.amazon.com/newui.html";
+
+
     //if form submission is sucessful, display submitted data
-    function confirmationMessage() {
+    function confirmationMessage(url) {
 
         let site = document.getElementById("site").value;
         let dayShift = document.getElementById("d-shift").value;
@@ -286,7 +289,7 @@
                             <div style='text-align: center;'><p style='display:inline'>Duration: </p>" + document.getElementById("Duration").value + "</div>\
                             <div style='text-align: center;'><p style='display:inline'>Request Reason: </p>" + document.getElementById("Request-Reason").value + "</div>\
                             <br/><br/>\
-                            <div><button value='SubmitRequest!'onClick='location.reload(true);'>Submit Another Request!</button></div>";
+                            <div><button value='SubmitRequest!'onClick='window.location.replace(url)'>Submit Another Request!</button></div>";
         return confmsg;
 
     }

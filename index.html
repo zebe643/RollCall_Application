@@ -3,18 +3,16 @@
   <head>
     <meta charset="UTF-8">
     <title>Rollcall</title>
+    <script type="text/javascript">
+      function onload(){
+
+        window.location.replace("https://rollcall.auth.eu-west-1.amazoncognito.com//oauth2/authorize?identity_provider=Midway&redirect_uri=https://dev-rollcall.corp.amazon.com/newui.html&response_type=code&client_id=nfm3pqn7899pnc4mkomangdeb")
+      }
+    </script>
   </head>
-  <body>
-  	<div style="margin: auto; width: 50%; border: 3px solid green; padding: 10px; text-align: center;">
-  		<h1>RollCall</h1>
-  	</div>
-  	<div style="margin: auto; width: 50%;text-align: center;">
-  <div id="signup" style="margin: auto; display: inline-block;">
-      <a href="signup.html"><button style="width: 155px">SignUp</button></a>
-  </div>
-  <div id="signup" style="margin: auto; display: inline-block; padding-top: 25px;">
-      <a href="https://rollcall.auth.eu-west-1.amazoncognito.com/login?response_type=token&client_id=nfm3pqn7899pnc4mkomangdeb&redirect_uri=http://localhost:8000/newui.html"><button style="width: 155px">SignIn</button></a>
-  </div>
-    	</div>
+  <body onload="onload()">
+  	<div>
+      
+    </div>
     </body>
   </html>

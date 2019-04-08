@@ -128,8 +128,8 @@
             ClientId : 'nfm3pqn7899pnc4mkomangdeb', 
             AppWebDomain : 'rollcall.auth.eu-west-1.amazoncognito.com',  
             TokenScopesArray : ['openid', 'email', 'phone', 'profile', 'aws.cognito.signin.user.admin'],
-            RedirectUriSignIn : 'http://localhost:8000/newui.html',
-            RedirectUriSignOut : 'http://localhost:8000',
+            RedirectUriSignIn : 'https://dev-rollcall.corp.amazon.com/newui.html',
+            RedirectUriSignOut : 'https://inside.amazon.com/',
             IdentityProvider : 'Midway', 
             UserPoolId : 'eu-west-1_i0HfJ8ilR'
         };
@@ -197,6 +197,8 @@
                 window.location.replace = "newui.html";
             };       
         }
+
+    
 
     </script>
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
