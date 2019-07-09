@@ -2,15 +2,13 @@
 <html>
 
 <head>
-<!-- Required meta tags -->
+    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta content="initial-scale=1, shrink-to-fit=no, width=device-width" name="viewport">
-
     <!-- CSS -->
     <!-- Add Material font (Roboto) and Material icon as needed -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i|Roboto+Mono:300,400,700|Roboto+Slab:300,400,700" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
     <!-- Add Material CSS, replace Bootstrap CSS -->
     <link href="material/css/material.min.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
@@ -31,219 +29,267 @@
     <script src="js/amazon-cognito-identity.min.js"></script>
     <script src="dist/amazon-cognito-auth.min.js"></script>
     <link rel="shortcut icon" href="favicon.ico" type="image/vnd.microsoft.icon">
-
 </head>
 
 <body onload="onLoad()">
-<div class="container" style="padding: 5%">
-    <div class="row">
-        <div class="col-1"></div>
-                <div class="col-10">
-            <div>
-                <h1 class="display-4" style="display: block">Team Roster </h1>
-            </div>
-            <hr>
-            <div id="RosterTable">
-                <table id="rosterTable" class="table table-hover">
-              <thead>
-                
-                <tr id="dayRow">
-                  <th scope="col">Week-Day</th>
-                  <th scope="col" id="sun" style="text-align: center;">Sunday</th>
-                  <th scope="col" id="mon" style="text-align: center;">Monday</th>
-                  <th scope="col" id="tue" style="text-align: center;">Tuesday</th>
-                  <th scope="col" id="wed" style="text-align: center;">Wednesday</th>
-                  <th scope="col" id="thur" style="text-align: center;">Thursday</th>
-                  <th scope="col" id="fri" style="text-align: center;">Friday</th>
-                  <th scope="col" id="sat" style="text-align: center;">Saturday</th>
-                </tr>
-
-                <tr id="dateRow">
-                 <th scope="row">Date</th>
-                 <th scope='col' style='text-align: center;'></th>
-                 <th scope='col' style='text-align: center;'></th>
-                 <th scope='col' style='text-align: center;'></th>
-                 <th scope='col' style='text-align: center;'></th>
-                 <th scope='col' style='text-align: center;'></th>
-                 <th scope='col' style='text-align: center;'></th>
-                 <th scope='col' style='text-align: center;'></th>
-                </tr>
-              </thead>
-              <tbody id="IndivUserRow">
-              </tbody>
-            </div>
-            </table>
-            <hr>
-          <div style="float: right;">
-              <button id="nw" style="width: 150px">Next Week</button>
-          </div>
-          <div style="float: left;">
-              <button id="pw" style="width: 150px">Previous Week</button>
-          </div>
+    <div class="container" style="padding: 2%">
+        <div class="row">
+            <div class="col-1"></div>
+            <div class="col-10">
+                <div>
+                    <h1 id="pg-title" class="display-4" style="display: block"></h1>
+                </div>
+                <hr>
+                <div id="RosterTable">
+                    <table id="rosterTable" class="table table-hover">
+                        <thead>
+                            <tr id="dayRow">
+                                <th scope="col">Week-Day</th>
+                                <th scope="col" id="sun" style="text-align: center;">Sunday</th>
+                                <th scope="col" id="mon" style="text-align: center;">Monday</th>
+                                <th scope="col" id="tue" style="text-align: center;">Tuesday</th>
+                                <th scope="col" id="wed" style="text-align: center;">Wednesday</th>
+                                <th scope="col" id="thur" style="text-align: center;">Thursday</th>
+                                <th scope="col" id="fri" style="text-align: center;">Friday</th>
+                                <th scope="col" id="sat" style="text-align: center;">Saturday</th>
+                            </tr>
+                            <tr id="dateRow">
+                                <th scope="row">Date</th>
+                                <td class='hd_date_cell' scope='col' style='text-align: center;'></td>
+                                <td class='hd_date_cell' scope='col' style='text-align: center;'></td>
+                                <td class='hd_date_cell' scope='col' style='text-align: center;'></td>
+                                <td class='hd_date_cell' scope='col' style='text-align: center;'></td>
+                                <td class='hd_date_cell' scope='col' style='text-align: center;'></td>
+                                <td class='hd_date_cell' scope='col' style='text-align: center;'></td>
+                                <td class='hd_date_cell' scope='col' style='text-align: center;'></td>
+                            </tr>
+                        </thead>
+                        <tbody id="IndivUserRow">
+                        </tbody>
+                    </table>
+                </div>
+                <hr>
+                <div style="float: right;">
+                    <button id="nw" style="width: 150px">Next Week</button>
+                </div>
+                <div style="float: left;">
+                    <button id="pw" style="width: 150px">Previous Week</button>
+                </div>
             </div>
         </div>
         <div class="col-1"></div>
-
-    <script type="text/javascript">
-
-      document.getElementById("sun").innerHTML += "1";
-     
-    AWS.config.apiVersions = {
-      cognitoidentityserviceprovider: '2016-04-18',
-    };
-    AWS.config.update({
-        region: 'eu-west-1'
-    });
-    AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: 'eu-west-1:08ef8fa8-18f8-4f87-ad0f-d67cc25b28fb'});
-
-    var lambda = new AWS.Lambda({region: 'eu-west-1', apiVersion: '2015-03-31'});
-    var pullParams = {
-      FunctionName : 'list-userpool-users',
-      InvocationType : 'RequestResponse',
-      LogType : 'None'
-    };
-    // create variable to hold data returned by the Lambda function
-    lambda.invoke(pullParams, function(error, data) {
-      if (error) {
-        console.log(error);
-      } else {
-        pullResults = JSON.parse(JSON.parse(data.Payload));
-        //console.log(pullResults)
-        var userIdentity = pullResults.Users
-        var uname = userIdentity
-        for(var i = 0; i < userIdentity.length; i++){
-          var IndivUser = userIdentity[i]['Attributes'][2]['Value']
-          userName = JSON.parse(IndivUser)
-          Nname = userName[0]['userId']
-          var IndivUserShift = userIdentity[i]['Attributes'][6]['Value']
-          if(IndivUserShift == "Mon-Fri"){
-            document.getElementById('IndivUserRow').innerHTML += "<tr>\
-                  <th scope='row'>"+Nname+"</th>\
-                  <td bgcolor='FFFF00'>OFF</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='FFFF00'>OFF</td></tr>";          
-                }else if(IndivUserShift == "Tue-Sat"){
-            document.getElementById('IndivUserRow').innerHTML += "<tr>\
-                  <th scope='row'>"+Nname+"</th>\
-                  <td bgcolor='FFFF00'>OFF</td>\
-                  <td bgcolor='FFFF00'>OFF</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td></tr>";            
-          }     else if(IndivUserShift == "Sun-Thurs"){
-                   document.getElementById('IndivUserRow').innerHTML += "<tr>\
-                  <th scope='row'>"+Nname+"</th>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='FFFF00'>OFF</td>\
-                  <td bgcolor='FFFF00'>OFF</td></tr>"; 
-          }            
-      
-        }
-
-      }
-    })
-
-    var cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
-    var accessTk = initCognitoSDK();
-    var accessToken = accessTk.signInUserSession['accessToken']['jwtToken'];
-    //console.log(accessToken)
-
-    function onLoad() {
-        var auth = initCognitoSDK();
-        var curUrl = window.location.href;
-        auth.parseCognitoWebResponse(curUrl);
-        //console.log(auth)
-    }
-
-    // Initialize a cognito auth object.
-    function initCognitoSDK() {
-        var authData = {
-            ClientId : 'nfm3pqn7899pnc4mkomangdeb', 
-            AppWebDomain : 'rollcall.auth.eu-west-1.amazoncognito.com',  
-            TokenScopesArray : ['openid', 'email', 'phone', 'profile', 'aws.cognito.signin.user.admin'],
-            RedirectUriSignIn : 'https://dev-rollcall.corp.amazon.com/newui.html',
-            RedirectUriSignOut : 'https://inside.amazon.com/',
-            IdentityProvider : 'Midway', 
-            UserPoolId : 'eu-west-1_i0HfJ8ilR'
+        <script type="text/javascript">
+          var userIdentity;
+          var uname;
+        AWS.config.apiVersions = {
+            cognitoidentityserviceprovider: '2016-04-18',
         };
-        
-        var auth = new AmazonCognitoIdentity.CognitoAuth(authData);
-        auth.userhandler = {
-            onSuccess: function(result) {
-            },
-            onFailure: function(err) {
-                alert("Error!" + err);
+        AWS.config.update({
+            region: 'eu-west-1'
+        });
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({ IdentityPoolId: 'eu-west-1:08ef8fa8-18f8-4f87-ad0f-d67cc25b28fb' });
+
+        var lambda = new AWS.Lambda({ region: 'eu-west-1', apiVersion: '2015-03-31' });
+        var pullParams = {
+            FunctionName: 'list-userpool-users',
+            InvocationType: 'RequestResponse',
+            LogType: 'None'
+        };
+        // create variable to hold data returned by the Lambda function
+        let apireq = lambda.invoke(pullParams, function(error, data) {
+            if (error) {
+                console.log(error);
+            } else {
+                pullResults = JSON.parse(JSON.parse(data.Payload));
+                //console.log("Lambda results: ", pullResults)
+                userIdentity = pullResults[0]['Users']
+                uname = userIdentity
+                updateRosterTable()
             }
-        };
-        auth.useCodeGrantFlow();
-        return auth;
-    }
+            return pullResults
+        })
 
-      function addDate(){
-        initWeek();
-        window.currentWeek = populateWeek(window.currentWeek);
-      }
+        var cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
+        var dynamodb = new AWS.DynamoDB();
+        var accessTk = initCognitoSDK();
+        var accessToken = accessTk.signInUserSession['accessToken']['jwtToken'];
+        var idToken = accessTk.signInUserSession['idToken']['payload'];
+        const team_profile = accessTk.signInUserSession['idToken']['payload']['custom:TeamProfile'];
+        document.getElementById("pg-title").innerHTML = "Team Roster - " + team_profile
 
-      addDate();
-
-      function initWeek(){
-        if(window.currentWeek == null){
-          window.currentWeek = new Date();
-          window.currentWeek.setDate(window.currentWeek.getDate() - window.currentWeek.getDay() - 1);
+        function updateRosterTable() {
+          console.log(pullResults);
+          for (var i = 0; i < userIdentity.length; i++) {
+                    var IndivUser = userIdentity[i]['Attributes'][2]['Value']
+                    userName = JSON.parse(IndivUser)
+                    Nname = userName[0]['userId']
+                    var IndivUserShift = userIdentity[i]['Attributes'][6]['Value']
+                    let teamprofile = userIdentity[i]['Attributes'][9]['Value']
+                    let ddb_query_dates = pullResults[1]['Items'][i]['StartDate']['S']
+                    let ddb_query_Username = pullResults[1]['Items'][i]['Username']['S']
+                    let ddb_query_length = pullResults[1]['Count']
+                    let ddb_array = pullResults[1]["Items"]
+                    let ddb_leave_dur = pullResults[1]['Items'][i]['Duration']['S']
+                    let ddb_leave_dur_int = parseInt(ddb_leave_dur)
+                    if (IndivUserShift == "Mon-Fri" && teamprofile === team_profile) {
+                        document.getElementById('IndivUserRow').innerHTML += "<tr id=" + Nname + " scope='row' class='row-of-data-rename-me-zac'><td id=" + Nname + ">" + Nname + "</td>\
+                  <td class='" + Nname + "_" + "date_cell' bgcolor='FFFF00'>OFF</td>\
+                  <td class='" + Nname + "_" + "date_cell' bgcolor='00FF00'>IN</td>\
+                  <td class='" + Nname + "_" + "date_cell' bgcolor='00FF00'>IN</td>\
+                  <td class='" + Nname + "_" + "date_cell' bgcolor='00FF00'>IN</td>\
+                  <td class='" + Nname + "_" + "date_cell' bgcolor='00FF00'>IN</td>\
+                  <td class='" + Nname + "_" + "date_cell' bgcolor='00FF00'>IN</td>\
+                  <td class='" + Nname + "_" + "date_cell' bgcolor='FFFF00'>OFF</td></tr>"
+                        //for loop to iterate over every leave request in ddb table
+                        for (var j = 0; j < ddb_query_length; j++) {
+                            let ddb_query_Username1 = pullResults[1]['Items'][j]['Username']['S']
+                            let ddb_query_dates1 = pullResults[1]['Items'][i]['StartDate']['S']
+                            //checking to see if there is a match between cognito user and ddb leave request record
+                            if (ddb_query_Username1 == Nname) {
+                                let arr_date = ddb_array[j]['StartDate']['S']
+                                table = document.getElementById("rosterTable");
+                                //for loop to iterate over ever row in table
+                                for (var p = 0; p = table.rows[p]; p++) {
+                                    //for loop to iterate over the cells in each row
+                                    for (var l = 0, col; col = p.cells[l]; l++) {
+                                        if (l == 7) {
+                                            continue;
+                                        }
+                                        let hdr_cells = document.getElementsByClassName('hd_date_cell')[l].innerHTML //grabbing value of 'Date' headings
+                                        uni_hdr_cells = Nname + "_" + hdr_cells //making this value unique for each user
+                                        document.getElementsByClassName(Nname + "_" + 'date_cell')[l].setAttribute('data-date', uni_hdr_cells) //setting the attribute value of each cell
+                                        let header_date_value = table.rows[1].cells[l].innerText;
+                                        let uni_cell_date_value = document.getElementsByClassName(Nname + "_" + 'date_cell')[l].getAttribute('data-date')
+                                        let uni_arr_date = Nname + "_" + arr_date
+                                        if (uni_arr_date === uni_cell_date_value) {
+                                            console.log("Matched user: " + ddb_query_Username1, Nname + " with dates " + uni_cell_date_value, uni_arr_date + " for " + ddb_leave_dur_int + " day(s)");
+                                            if(ddb_leave_dur_int > 1){
+                                                var red_box = document.querySelector("[data-date=" + "'" + Nname + "_" + arr_date + "'" + "]")
+                                                red_box.style.backgroundColor = "#FF0000"
+                                                red_box.innerHTML = "HOL"
+                                            }else{
+                                                let red_box = document.querySelector("[data-date=" + "'" + Nname + "_" + arr_date + "'" + "]")
+                                                red_box.style.backgroundColor = "#FF0000"
+                                                red_box.innerHTML = "HOL"                                                
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else if (IndivUserShift == "Tue-Sat" && teamprofile === team_profile) {
+                        document.getElementById('IndivUserRow').innerHTML += "<tr class='row-of-data-rename-me-zac'><th id='nname' scope='row'>" + Nname + "</th>\
+                  <td bgcolor='FFFF00'>OFF</td>\
+                  <td bgcolor='FFFF00'>OFF</td>\
+                  <td bgcolor='00FF00'>IN</td>\
+                  <td bgcolor='00FF00'>IN</td>\
+                  <td bgcolor='00FF00'>IN</td>\
+                  <td bgcolor='00FF00'>IN</td>\
+                  <td bgcolor='00FF00'>IN</td></tr>";
+                    } else if (IndivUserShift == "Sun-Thurs" && teamprofile === team_profile) {
+                        document.getElementById('IndivUserRow').innerHTML += "<tr class='row-of-data-rename-me-zac'><th id='nname' scope='row'>" + Nname + "</th>\
+                   <td bgcolor='00FF00'>IN</td>\
+                  <td bgcolor='00FF00'>IN</td>\
+                  <td bgcolor='00FF00'>IN</td>\
+                  <td bgcolor='00FF00'>IN</td>\
+                  <td bgcolor='00FF00'>IN</td>\
+                  <td bgcolor='FFFF00'>OFF</td>\
+                  <td bgcolor='FFFF00'>OFF</td></tr>"
+                    }
+                }
         }
-      }
-
-      function getDateLabel(date){
-        const month = date.toLocaleString('en-us', { month: 'long' });
-        return date.getDate() + " " + month.substring(0,3);
-      }
-
-      function populateWeek(date){
-        els = document.getElementById("dateRow").getElementsByTagName('th');
-        for (var i = 1; i < els.length; i++) {
-          date.setDate( date.getDate() + 1 );
-          els[i].innerHTML = getDateLabel(date);
+        function onLoad() {
+            var auth = initCognitoSDK();
+            var curUrl = window.location.href;
+            auth.parseCognitoWebResponse(curUrl);
         }
-        return date;
-      }
 
-    function movePreviousWeek(){
-      var date = window.currentWeek;
-      date.setDate(date.getDate() - 14);
-      window.currentWeek  = populateWeek(date);
-    }
-    function moveNextWeek(){ 
-      console.log("clicking next")
-      window.currentWeek  = populateWeek(window.currentWeek);
-    }
+        // Initialize a cognito auth object.
+        function initCognitoSDK() {
+            var authData = {
+                ClientId: 'nfm3pqn7899pnc4mkomangdeb',
+                AppWebDomain: 'rollcall.auth.eu-west-1.amazoncognito.com',
+                TokenScopesArray: ['openid', 'email', 'phone', 'profile', 'aws.cognito.signin.user.admin'],
+                RedirectUriSignIn: 'https://dev-rollcall.corp.amazon.com/newui.html',
+                RedirectUriSignOut: 'https://inside.amazon.com/',
+                IdentityProvider: 'Midway',
+                UserPoolId: 'eu-west-1_i0HfJ8ilR'
+            };
 
-    document.getElementById("nw").addEventListener("click", moveNextWeek);
-    function goingPreviousWeek(){ 
-      console.log("clicking prev")
-    }
-    
-    document.getElementById("pw").addEventListener("click", movePreviousWeek);
+            var auth = new AmazonCognitoIdentity.CognitoAuth(authData);
+            auth.userhandler = {
+                onSuccess: function(result) {},
+                onFailure: function(err) {
+                    alert("Error!" + err);
+                }
+            };
+            auth.useCodeGrantFlow();
+            return auth;
+        }
+
+        function addDate() {
+            initWeek();
+            window.currentWeek = populateWeek(window.currentWeek);
+        }
+
+        addDate();
+
+        function initWeek() {
+            if (window.currentWeek == null) {
+                window.currentWeek = new Date();
+                window.currentWeek.setDate(window.currentWeek.getDate() - window.currentWeek.getDay() - 1);
+            }
+        }
+
+        function getDateLabel(date) {
+            const month = date.toLocaleString('en-GB')
+            let nmonth = month.split(",")
+            return nmonth[0]
+        }
+
+        function populateWeek(date) {
+            els = document.getElementById("dateRow").getElementsByClassName('hd_date_cell');
+            for (let i = 0; i < els.length; i++) {
+                date.setDate(date.getDate() + 1);
+                els[i].innerHTML = getDateLabel(date);
+            }
+            return date;
+        }
+
+        function movePreviousWeek() {
+            var date = window.currentWeek;
+            date.setDate(date.getDate() - 14);
+            window.currentWeek = populateWeek(date);
+            clearTable();
+            updateRosterTable();
+
+        }
+
+        function clearTable() {
+          //this does not do its job, just like zac.
+          let x = document.getElementById('IndivUserRow');
+          let new_body = document.createElement('tbody');
+          new_body.setAttribute('id', 'IndivUserRow');
+          x.parentNode.replaceChild(new_body, x);
+
+        }
+
+        function moveNextWeek() {
+            window.currentWeek = populateWeek(window.currentWeek);
+            clearTable();
+            updateRosterTable();
+        }
 
 
-
-    </script>
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-
-    <!-- Then Material JavaScript on top of Bootstrap JavaScript -->
-    <script src="material/js/material.min.js"></script>
+        document.getElementById("nw").addEventListener("click", moveNextWeek);
+        document.getElementById("pw").addEventListener("click", movePreviousWeek);
+        </script>
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+        <!-- Then Material JavaScript on top of Bootstrap JavaScript -->
+        <script src="material/js/material.min.js"></script>
 </body>
 
 </html>

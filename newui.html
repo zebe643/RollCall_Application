@@ -241,11 +241,14 @@
     //rearranges the format to dd//mm//yyyy
     function dateFormat() {
         var oldDate = new Date(document.getElementById("startdate").value);
-        var month = oldDate.getMonth() + 1;
-        var day = oldDate.getDate();
-        var year = oldDate.getFullYear();
-        var newDate = day + "/" + month + "/" + year;
-        return newDate;
+        let month = oldDate.toLocaleString('en-GB')
+        let newDate = month.split(",")
+        //return nmonth[0]
+        // var month = oldDate.getMonth() + 1;
+        // var day = oldDate.getDate();
+        // var year = oldDate.getFullYear();
+        // var newDate = day + "/" + month + "/" + year;
+        return newDate[0];
     }
 
     //Checks to see if the above validation functions are true, and if so, call apigw client to send form data
