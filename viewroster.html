@@ -32,6 +32,27 @@
 </head>
 
 <body onload="onLoad()">
+    <div class="container-fluid">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">AWS Rollcall</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item active">
+            <a class="nav-link" href="newui.html">Request Holiday</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="viewroster.html">View Roster <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="myrequests.html">My Requests</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+</div>
     <div class="container" style="padding: 2%">
         <div class="row">
             <div class="col-1"></div>
@@ -79,8 +100,10 @@
         </div>
         <div class="col-1"></div>
         <script type="text/javascript">
-          var userIdentity;
-          var uname;
+        var auth;
+        var firstLoginState;            
+        var userIdentity;
+        var uname;
         AWS.config.apiVersions = {
             cognitoidentityserviceprovider: '2016-04-18',
         };
@@ -88,120 +111,24 @@
             region: 'eu-west-1'
         });
         AWS.config.credentials = new AWS.CognitoIdentityCredentials({ IdentityPoolId: 'eu-west-1:08ef8fa8-18f8-4f87-ad0f-d67cc25b28fb' });
-
-        var lambda = new AWS.Lambda({ region: 'eu-west-1', apiVersion: '2015-03-31' });
-        var pullParams = {
-            FunctionName: 'list-userpool-users',
-            InvocationType: 'RequestResponse',
-            LogType: 'None'
-        };
-        // create variable to hold data returned by the Lambda function
-        let apireq = lambda.invoke(pullParams, function(error, data) {
-            if (error) {
-                console.log(error);
-            } else {
-                pullResults = JSON.parse(JSON.parse(data.Payload));
-                //console.log("Lambda results: ", pullResults)
-                userIdentity = pullResults[0]['Users']
-                uname = userIdentity
-                updateRosterTable()
-            }
-            return pullResults
-        })
+        var auth = initCognitoSDK();
+        var sesh = auth.getSession();
+        var curUrl = window.location.href;
+        auth.parseCognitoWebResponse(curUrl);
 
         var cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
         var dynamodb = new AWS.DynamoDB();
         var accessTk = initCognitoSDK();
         var accessToken = accessTk.signInUserSession['accessToken']['jwtToken'];
         var idToken = accessTk.signInUserSession['idToken']['payload'];
-        const team_profile = accessTk.signInUserSession['idToken']['payload']['custom:TeamProfile'];
-        document.getElementById("pg-title").innerHTML = "Team Roster - " + team_profile
 
-        function updateRosterTable() {
-          console.log(pullResults);
-          for (var i = 0; i < userIdentity.length; i++) {
-                    var IndivUser = userIdentity[i]['Attributes'][2]['Value']
-                    userName = JSON.parse(IndivUser)
-                    Nname = userName[0]['userId']
-                    var IndivUserShift = userIdentity[i]['Attributes'][6]['Value']
-                    let teamprofile = userIdentity[i]['Attributes'][9]['Value']
-                    let ddb_query_dates = pullResults[1]['Items'][i]['StartDate']['S']
-                    let ddb_query_Username = pullResults[1]['Items'][i]['Username']['S']
-                    let ddb_query_length = pullResults[1]['Count']
-                    let ddb_array = pullResults[1]["Items"]
-                    let ddb_leave_dur = pullResults[1]['Items'][i]['Duration']['S']
-                    let ddb_leave_dur_int = parseInt(ddb_leave_dur)
-                    if (IndivUserShift == "Mon-Fri" && teamprofile === team_profile) {
-                        document.getElementById('IndivUserRow').innerHTML += "<tr id=" + Nname + " scope='row' class='row-of-data-rename-me-zac'><td id=" + Nname + ">" + Nname + "</td>\
-                  <td class='" + Nname + "_" + "date_cell' bgcolor='FFFF00'>OFF</td>\
-                  <td class='" + Nname + "_" + "date_cell' bgcolor='00FF00'>IN</td>\
-                  <td class='" + Nname + "_" + "date_cell' bgcolor='00FF00'>IN</td>\
-                  <td class='" + Nname + "_" + "date_cell' bgcolor='00FF00'>IN</td>\
-                  <td class='" + Nname + "_" + "date_cell' bgcolor='00FF00'>IN</td>\
-                  <td class='" + Nname + "_" + "date_cell' bgcolor='00FF00'>IN</td>\
-                  <td class='" + Nname + "_" + "date_cell' bgcolor='FFFF00'>OFF</td></tr>"
-                        //for loop to iterate over every leave request in ddb table
-                        for (var j = 0; j < ddb_query_length; j++) {
-                            let ddb_query_Username1 = pullResults[1]['Items'][j]['Username']['S']
-                            let ddb_query_dates1 = pullResults[1]['Items'][i]['StartDate']['S']
-                            //checking to see if there is a match between cognito user and ddb leave request record
-                            if (ddb_query_Username1 == Nname) {
-                                let arr_date = ddb_array[j]['StartDate']['S']
-                                table = document.getElementById("rosterTable");
-                                //for loop to iterate over ever row in table
-                                for (var p = 0; p = table.rows[p]; p++) {
-                                    //for loop to iterate over the cells in each row
-                                    for (var l = 0, col; col = p.cells[l]; l++) {
-                                        if (l == 7) {
-                                            continue;
-                                        }
-                                        let hdr_cells = document.getElementsByClassName('hd_date_cell')[l].innerHTML //grabbing value of 'Date' headings
-                                        uni_hdr_cells = Nname + "_" + hdr_cells //making this value unique for each user
-                                        document.getElementsByClassName(Nname + "_" + 'date_cell')[l].setAttribute('data-date', uni_hdr_cells) //setting the attribute value of each cell
-                                        let header_date_value = table.rows[1].cells[l].innerText;
-                                        let uni_cell_date_value = document.getElementsByClassName(Nname + "_" + 'date_cell')[l].getAttribute('data-date')
-                                        let uni_arr_date = Nname + "_" + arr_date
-                                        if (uni_arr_date === uni_cell_date_value) {
-                                            console.log("Matched user: " + ddb_query_Username1, Nname + " with dates " + uni_cell_date_value, uni_arr_date + " for " + ddb_leave_dur_int + " day(s)");
-                                            if(ddb_leave_dur_int > 1){
-                                                var red_box = document.querySelector("[data-date=" + "'" + Nname + "_" + arr_date + "'" + "]")
-                                                red_box.style.backgroundColor = "#FF0000"
-                                                red_box.innerHTML = "HOL"
-                                            }else{
-                                                let red_box = document.querySelector("[data-date=" + "'" + Nname + "_" + arr_date + "'" + "]")
-                                                red_box.style.backgroundColor = "#FF0000"
-                                                red_box.innerHTML = "HOL"                                                
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else if (IndivUserShift == "Tue-Sat" && teamprofile === team_profile) {
-                        document.getElementById('IndivUserRow').innerHTML += "<tr class='row-of-data-rename-me-zac'><th id='nname' scope='row'>" + Nname + "</th>\
-                  <td bgcolor='FFFF00'>OFF</td>\
-                  <td bgcolor='FFFF00'>OFF</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td></tr>";
-                    } else if (IndivUserShift == "Sun-Thurs" && teamprofile === team_profile) {
-                        document.getElementById('IndivUserRow').innerHTML += "<tr class='row-of-data-rename-me-zac'><th id='nname' scope='row'>" + Nname + "</th>\
-                   <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='00FF00'>IN</td>\
-                  <td bgcolor='FFFF00'>OFF</td>\
-                  <td bgcolor='FFFF00'>OFF</td></tr>"
-                    }
-                }
-        }
+
+        // Initialize a cognito auth object.
         function onLoad() {
             var auth = initCognitoSDK();
             var curUrl = window.location.href;
             auth.parseCognitoWebResponse(curUrl);
+            xmlhttpRequest(accessToken);
         }
 
         // Initialize a cognito auth object.
@@ -226,6 +153,156 @@
             auth.useCodeGrantFlow();
             return auth;
         }
+
+        function xmlhttpRequest(accessToken){
+            console.log("making http request...");
+            const Http = new XMLHttpRequest();
+            const url = 'https://rollcall.auth.eu-west-1.amazoncognito.com/oauth2/userInfo';
+            Http.open("GET", url);
+            Http.setRequestHeader("Authorization", "Bearer " + accessToken);
+            Http.send();
+            Http.onloadend = (e) => {
+                var response = JSON.parse(Http.responseText);
+                //console.log(response)
+                team_profile = response['custom:TeamProfile'];
+                document.getElementById("pg-title").innerHTML = "Team Roster - " + team_profile + " " + "<a href='newui.html'><span style='float: right;'>Request Holiday</span></a>"
+            }
+        }
+
+        var lambda = new AWS.Lambda({ region: 'eu-west-1', apiVersion: '2015-03-31' });
+        var pullParams = {
+            FunctionName: 'list-userpool-users',
+            InvocationType: 'RequestResponse',
+            LogType: 'None'
+        };
+        // create variable to hold data returned by the Lambda function
+        let apireq = lambda.invoke(pullParams, function(error, data) {
+            if (error) {
+                console.log(error);
+            } else {
+                pullResults = JSON.parse(JSON.parse(data.Payload));
+                //console.log("Lambda results: ", pullResults)
+                userIdentity = pullResults[0]['Users']
+                uname = userIdentity
+                updateRosterTable()
+            }
+            return pullResults
+        })
+
+        function updateRosterTable() {
+            //console.log(pullResults);
+            let ddb_array = pullResults[1]["Items"] 
+            for (var i = 0; i < userIdentity.length; i++) {
+                var IndivUser = userIdentity[i]['Attributes'][2]['Value']
+                userName = JSON.parse(IndivUser)
+                Nname = userName[0]['userId']
+                var IndivUserShift = userIdentity[i]['Attributes'][6]['Value']
+                let teamprofile = userIdentity[i]['Attributes'][9]['Value']
+                let ddb_query_length = pullResults[1]['Count']           
+                if (IndivUserShift == "Mon-Fri" && teamprofile === team_profile) {
+                    document.getElementById('IndivUserRow').innerHTML += "<tr id=" + Nname + " scope='row' class='roster-row'><td id=" + Nname + ">" + Nname + "</td>\
+                  <td class='" + Nname + "_" + "date_cell' bgcolor='FFFF00'>OFF</td>\
+                  <td class='" + Nname + "_" + "date_cell' bgcolor='00FF00'>IN</td>\
+                  <td class='" + Nname + "_" + "date_cell' bgcolor='00FF00'>IN</td>\
+                  <td class='" + Nname + "_" + "date_cell' bgcolor='00FF00'>IN</td>\
+                  <td class='" + Nname + "_" + "date_cell' bgcolor='00FF00'>IN</td>\
+                  <td class='" + Nname + "_" + "date_cell' bgcolor='00FF00'>IN</td>\
+                  <td class='" + Nname + "_" + "date_cell' bgcolor='FFFF00'>OFF</td></tr>"
+                    //for loop to iterate over every leave request in ddb table
+                    for (var j = 0; j < ddb_query_length; j++) {
+                        let ddb_query_Username = pullResults[1]['Items'][j]['Username']['S']
+                        let ddb_query_dates = pullResults[1]['Items'][i]['StartDate']['S']
+                        let ddb_request_status = ddb_array[j]['RequestStatus']['S']
+                        //checking to see if there is a match between cognito user and ddb leave request record
+                        if (ddb_query_Username == Nname && ddb_request_status === "1") {
+                            var str_date = ddb_array[j]['StartDate']['S']
+                            let end_date = ddb_array[j]['EndDate']['S']
+                            table = document.getElementById("rosterTable");
+                            //for loop to iterate over ever row in table
+                            for (var p = 0; p = table.rows[p]; p++) {
+                                //for loop to iterate over the cells in each row
+                                for (var l = 0, col; col = p.cells[l]; l++) {
+                                    if (l == 7) {
+                                        continue;
+                                    }
+                                    var hdr_cells = document.getElementsByClassName('hd_date_cell')[l].innerHTML //grabbing value of 'Date' headings
+                                    var uni_hdr_cells = Nname + "_" + hdr_cells //making this value unique for each user
+                                    document.getElementsByClassName(Nname + "_" + 'date_cell')[l].setAttribute('data-date', uni_hdr_cells) //setting the attribute value of each cell
+                                    var header_date_value = table.rows[1].cells[l].innerText;
+                                    var uni_cell_date_value = document.getElementsByClassName(Nname + "_" + 'date_cell')[l].getAttribute('data-date')
+                                    var uni_str_date = Nname + "_" + str_date
+                                    var uni_end_date = Nname + "_" + end_date
+                                    //checking to see if the start date matches a cell attribute value
+                                    if (uni_str_date === uni_cell_date_value) {
+                                        //checking if request is only for 1 day
+                                        if (str_date === end_date) { 
+                                            let red_box = document.querySelector("[data-date=" + "'" + Nname + "_" + str_date + "'" + "]")
+                                            red_box.style.backgroundColor = "rgb(178,34,34, 0.8)"
+                                            red_box.innerHTML = "HOL"
+                                        } else {
+                                            //if date range is more than 1 day, first update current cell CSS properties
+                                            let red_box = document.querySelector("[data-date=" + "'" + Nname + "_" + str_date + "'" + "]")
+                                            red_box.style.backgroundColor = "rgb(178,34,34, 0.8)" //set red background colour
+                                            red_box.innerHTML = "HOL" //Change text from IN to OFF
+                                            try {
+                                                //getting the next cell and colouring red, as date range is > 1
+                                                let data_d = red_box.nextElementSibling
+                                                if (data_d.innerHTML === "OFF") {
+                                                    //do nothing
+                                                }else{ 
+                                                data_d.style.backgroundColor = "rgb(178,34,34, 0.8)"
+                                                data_d.innerHTML = "HOL"
+                                            }
+                                        }
+                                        catch (err){}
+                                    }
+                                }
+                                    //check to see if end date matches cell attribute value
+                                    if (uni_end_date === uni_cell_date_value) {
+                                        //check if request is only for one day
+                                        if(end_date == str_date){
+                                            let red_box = document.querySelector("[data-date=" + "'" + Nname + "_" + end_date + "'" + "]")
+                                            red_box.style.backgroundColor = "rgb(178,34,34, 0.8)"
+                                            red_box.innerHTML = "HOL"                                            
+                                        }else{
+                                        //request is for more than 1 day                         
+                                        let red_box = document.querySelector("[data-date=" + "'" + Nname + "_" + end_date + "'" + "]")
+                                        red_box.style.backgroundColor = "rgb(178,34,34, 0.8)"
+                                        red_box.innerHTML = "HOL"
+                                        try {
+                                            let red_box = document.querySelector("[data-date=" + "'" + Nname + "_" + end_date + "'" + "]") //get current end date cell
+                                            let ea_data_d = red_box.previousElementSibling.getAttribute('data-date') //getting cell before selected end date
+                                            let e_data_d = red_box.previousElementSibling
+                                            //check to see if the previous cell is a week day column or if it is an "OFF" column. If is, dont update cell attr, else colour red
+                                            if (e_data_d.innerHTML === "OFF" || e_data_d.innerHTML === "HOL") { 
+                                                //dont do anything
+                                            } else {
+                                                //if cell isnt any of above, colour it red
+                                                e_data_d.style.backgroundColor = "rgb(178,34,34, 0.8)"
+                                                e_data_d.innerHTML = "HOL"
+                                                var prv_data_d = e_data_d.previousElementSibling
+                                            } if(prv_data_d.getAttribute('data-date') != uni_str_date && prv_data_d.innerHTML != "OFF" ){
+                                                prv_data_d.style.backgroundColor = "rgb(178,34,34, 0.8)"
+                                                prv_data_d.innerHTML = "HOL"
+                                            } else{
+                                                //do nothing
+                                            }
+
+                                        } catch (err) {
+                                            // console.log(err)
+                                        }
+                                    }
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } 
+        }
+
+
 
         function addDate() {
             initWeek();
@@ -266,11 +343,10 @@
         }
 
         function clearTable() {
-          //this does not do its job, just like zac.
-          let x = document.getElementById('IndivUserRow');
-          let new_body = document.createElement('tbody');
-          new_body.setAttribute('id', 'IndivUserRow');
-          x.parentNode.replaceChild(new_body, x);
+            let x = document.getElementById('IndivUserRow');
+            let new_body = document.createElement('tbody');
+            new_body.setAttribute('id', 'IndivUserRow');
+            x.parentNode.replaceChild(new_body, x);
 
         }
 
