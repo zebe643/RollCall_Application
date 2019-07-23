@@ -167,13 +167,25 @@
         }
     };
 
+    console.log(window.location.hostname)
+
     // Initialize a cognito auth object.
     function initCognitoSDK() {
+        if(window.location.hostname === "dev-rollcall.corp.amazon.com"){
+            var cog_redir_uri = "https://dev-rollcall.corp.amazon.com/newui.html"
+        } else if(window.location.hostname === "beta-rollcall.corp.amazon.com"){
+            var cog_redir_uri = "https://beta-rollcall.corp.amazon.com/newui.html"
+        } else if(window.location.hostname === "rollcall.corp.amazon.com"){
+            var cog_redir_uri = "https://rollcall.corp.amazon.com/newui.html"
+        } else{
+            //do nothing
+        }
+
         var authData = {
             ClientId: 'nfm3pqn7899pnc4mkomangdeb',
             AppWebDomain: 'rollcall.auth.eu-west-1.amazoncognito.com',
             TokenScopesArray: ['openid', 'email', 'phone', 'profile', 'aws.cognito.signin.user.admin'],
-            RedirectUriSignIn: 'https://dev-rollcall.corp.amazon.com/newui.html',
+            RedirectUriSignIn: cog_redir_uri,
             RedirectUriSignOut: 'https://dev-rollcall.corp.amazon.com',
             IdentityProvider: 'Midway',
             UserPoolId: 'eu-west-1_i0HfJ8ilR'
